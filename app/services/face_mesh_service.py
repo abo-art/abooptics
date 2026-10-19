@@ -6,6 +6,7 @@ import cv2
 import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
+import re
 from typing import Optional, Tuple, List, Dict
 
 from app.models.face_analysis import (
@@ -13,10 +14,56 @@ from app.models.face_analysis import (
     FaceMetrics,
     FaceShapeInfo,
     KeyPoint2D,
-    LandmarkSummary
+    LandmarkSummary,
+    DATA_URI_PREFIX_REGEX,
+    BASE64_IMAGE_REGEX
 )
 from app.services.styling_engine import StylingEngine
 from app.services.catalog_service import CatalogService
+
+def extract_and_decode_base64(raw_b64: str) -> bytes:
+    """
+    Очищает и декодирует base64-строку изображения:
+    1. Автоматически удаляет data-URI префикс (типа data:image/...;base64,) если он передан с фронтенда.
+    2. Удаляет любые пробелы, табуляции и переносы строк.
+    3. Поддерживает URL-safe base64 (- и _).
+    4. Автоматически выравнивает длину padding символами '='.
+    5. Декодирует в байты изображения с валидацией минимального размера.
+    """
+    if not raw_b64 or not isinstance(raw_b64, str):
+        raise ValueError("Base64 строка пуста или не является строковым значением")
+
+    cleaned = raw_b64.strip()
+
+    # Удаление префикса data-URI, если присутствует запятая
+    if "," in cleaned:
+        cleaned = cleaned.split(",", 1)[1].strip()
+    elif cleaned.lower().startswith("data:"):
+        cleaned = DATA_URI_PREFIX_REGEX.sub("", cleaned).strip()
+
+    # Удаление всех пробельных символов и переводов строк
+    cleaned = re.sub(r"\s+", "", cleaned)
+
+    if not cleaned:
+        raise ValueError("Base64 данные отсутствуют после очистки префикса")
+
+    # Поддержка URL-safe base64
+    cleaned = cleaned.replace("-", "+").replace("_", "/")
+
+    # Выравнивание padding до кратности 4
+    missing_padding = len(cleaned) % 4
+    if missing_padding:
+        cleaned += "=" * (4 - missing_padding)
+
+    try:
+        decoded_bytes = base64.b64decode(cleaned, validate=False)
+    except Exception as exc:
+        raise ValueError(f"Ошибка декодирования base64: {str(exc)}")
+
+    if not decoded_bytes or len(decoded_bytes) < 100:
+        raise ValueError("Декодированные данные изображения слишком малы или повреждены")
+
+    return decoded_bytes
 
 MODEL_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "face_landmarker.task")
 
@@ -428,3 +475,12 @@ class FaceMeshService:
             all_shapes_scores=all_shapes_scores,
             processing_time_ms=elapsed
         )
+
+    def analyze_base64(self, base64_str: str, frame_shape_hint: Optional[str] = None) -> AnalyzeResponse:
+        """
+        Анализирует изображение, переданное в виде base64-строки:
+        автоматически очищает data-URI префикс (data:image/...;base64,) и валидирует данные.
+        """
+        image_bytes = extract_and_decode_base64(base64_str)
+        return self.analyze_image_bytes(image_bytes, frame_shape_hint=frame_shape_hint)
+

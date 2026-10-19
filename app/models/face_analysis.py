@@ -1,5 +1,54 @@
+import re
 from typing import List, Dict, Optional, Any
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
+
+# Регулярное выражение для валидации: принимает как чистый base64, так и data-URI (data:image/...;base64,...)
+BASE64_IMAGE_PATTERN = r"^(?:data:image\/[a-zA-Z0-9.+_-]+;base64,)?[A-Za-z0-9+/_\-\s\r\n=]+$"
+BASE64_IMAGE_REGEX = re.compile(BASE64_IMAGE_PATTERN, re.IGNORECASE)
+DATA_URI_PREFIX_REGEX = re.compile(r"^data:image\/[a-zA-Z0-9.+_-]+;base64,", re.IGNORECASE)
+
+class AnalyzeRequest(BaseModel):
+    """
+    Модель входящего запроса на биометрический анализ геометрии лица и оправы.
+    Принимает изображение в формате base64 (чистый base64 либо data-URI схема: data:image/jpeg;base64,...).
+    """
+    image_base64: str = Field(
+        ...,
+        description="Base64-строка изображения (чистый base64 либо Data URI data:image/jpeg;base64,...)",
+        pattern=BASE64_IMAGE_PATTERN
+    )
+    frame_shape: Optional[str] = Field(
+        None,
+        description="Опциональная подсказка формы оправы (square, round, oval, aviator, etc.)"
+    )
+
+    @field_validator("image_base64")
+    @classmethod
+    def validate_image_base64_format(cls, value: str) -> str:
+        if not value or not isinstance(value, str):
+            raise ValueError("image_base64 не может быть пустым")
+
+        trimmed = value.strip()
+        if not trimmed:
+            raise ValueError("image_base64 не может содержать только пробелы")
+
+        if not BASE64_IMAGE_REGEX.match(trimmed):
+            raise ValueError(
+                "Некорректный формат base64. Ожидается чистая base64-строка или data-URI схема (data:image/...;base64,...)"
+            )
+
+        return trimmed
+
+    def get_clean_base64(self) -> str:
+        """
+        Возвращает очищенную от data-URI префикса и пробелов base64-строку.
+        """
+        raw = self.image_base64.strip()
+        if "," in raw:
+            raw = raw.split(",", 1)[1]
+        else:
+            raw = DATA_URI_PREFIX_REGEX.sub("", raw)
+        return re.sub(r"\s+", "", raw)
 
 class KeyPoint2D(BaseModel):
     x: float

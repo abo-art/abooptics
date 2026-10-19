@@ -1,13 +1,15 @@
 import os
+import json
 import base64
 from typing import Optional
 from fastapi import FastAPI, Request, HTTPException, Query
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import ValidationError
 
-from app.models.face_analysis import AnalyzeResponse
-from app.services.face_mesh_service import FaceMeshService
+from app.models.face_analysis import AnalyzeResponse, AnalyzeRequest
+from app.services.face_mesh_service import FaceMeshService, extract_and_decode_base64
 from app.services.catalog_service import CatalogService
 
 app = FastAPI(
@@ -80,7 +82,10 @@ async def health_check():
 async def analyze_face(request: Request):
     """
     Основной API-эндпоинт анализа геометрии лица и оценки посадки надетой оправы.
-    Принимает изображение через multipart/form-data (file) либо через application/json (image_base64).
+    Принимает изображение:
+      - application/json: валидируется моделью AnalyzeRequest (поддерживает чистый base64 и data-URI),
+      - multipart/form-data: загрузка файла через поле 'file'.
+    Выполняет автоматическую очистку префикса data:image/...;base64, и валидацию паттерна.
     """
     content_type = request.headers.get("content-type", "")
     image_bytes = None
@@ -96,24 +101,43 @@ async def analyze_face(request: Request):
     elif "application/json" in content_type:
         try:
             body = await request.json()
-            b64_str = body.get("image_base64", "")
-            if not frame_shape_hint and body.get("frame_shape"):
-                frame_shape_hint = str(body.get("frame_shape"))
-            if "," in b64_str:
-                b64_str = b64_str.split(",", 1)[1]
-            if b64_str:
-                image_bytes = base64.b64decode(b64_str)
         except Exception:
-            raise HTTPException(status_code=400, detail="Неверный формат base64 данных")
+            raise HTTPException(status_code=400, detail="Некорректный JSON в теле запроса")
+
+        try:
+            analyze_req = AnalyzeRequest.model_validate(body)
+        except ValidationError as e:
+            error_details = [f"{err['loc'][-1]}: {err['msg']}" for err in e.errors()]
+            raise HTTPException(
+                status_code=422,
+                detail=f"Ошибка валидации входных данных: {'; '.join(error_details)}"
+            )
+
+        if not frame_shape_hint and analyze_req.frame_shape:
+            frame_shape_hint = str(analyze_req.frame_shape)
+
+        try:
+            image_bytes = extract_and_decode_base64(analyze_req.image_base64)
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=str(e))
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Ошибка декодирования base64 данных: {str(e)}")
     else:
         raw_body = await request.body()
         if raw_body and len(raw_body) > 100:
-            image_bytes = raw_body
+            try:
+                parsed_json = json.loads(raw_body.decode("utf-8"))
+                analyze_req = AnalyzeRequest.model_validate(parsed_json)
+                if not frame_shape_hint and analyze_req.frame_shape:
+                    frame_shape_hint = str(analyze_req.frame_shape)
+                image_bytes = extract_and_decode_base64(analyze_req.image_base64)
+            except Exception:
+                image_bytes = raw_body
 
     if not image_bytes or len(image_bytes) < 100:
         raise HTTPException(
             status_code=400,
-            detail="Необходимо передать файл (multipart/form-data) или base64-строку изображения (application/json)"
+            detail="Необходимо передать файл (multipart/form-data) или валидную base64-строку изображения (application/json)"
         )
 
     service = FaceMeshService.get_instance()

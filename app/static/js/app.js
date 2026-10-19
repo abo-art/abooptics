@@ -297,6 +297,25 @@ class AboOptikaApp {
       });
 
       clearInterval(interval);
+
+      if (!response.ok) {
+        let errMessage = `Ошибка сервера (${response.status})`;
+        try {
+          const errData = await response.json();
+          if (errData && errData.detail) {
+            errMessage = typeof errData.detail === 'string'
+              ? errData.detail
+              : JSON.stringify(errData.detail);
+          } else if (errData && errData.message) {
+            errMessage = errData.message;
+          }
+        } catch (_) {
+          const rawText = await response.text().catch(() => '');
+          if (rawText) errMessage = rawText.slice(0, 150);
+        }
+        throw new Error(errMessage);
+      }
+
       const result = await response.json();
 
       if (!result.success || !result.face_detected) {

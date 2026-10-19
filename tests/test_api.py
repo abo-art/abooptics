@@ -58,6 +58,7 @@ def test_worn_frame_evaluation_scenario():
         assert len(alt["dimensions"]) > 3
 
 def test_worn_frame_evaluation_base64():
+    """Проверка работы с data-URI схемой (data:image/jpeg;base64,...)"""
     img_path = os.path.join(STATIC_DIR, "demo_faces", "wearing_round.jpg")
     with open(img_path, "rb") as f:
         b64 = "data:image/jpeg;base64," + base64.b64encode(f.read()).decode("utf-8")
@@ -68,6 +69,48 @@ def test_worn_frame_evaluation_base64():
     assert data["success"] is True
     assert data["face_detected"] is True
     assert len(data["top_alternatives"]) == 3
+
+def test_worn_frame_evaluation_pure_base64():
+    """Проверка работы с чистой base64 строкой (без префикса)"""
+    img_path = os.path.join(STATIC_DIR, "demo_faces", "wearing_round.jpg")
+    with open(img_path, "rb") as f:
+        pure_b64 = base64.b64encode(f.read()).decode("utf-8")
+    
+    res = client.post("/api/analyze", json={"image_base64": pure_b64, "frame_shape": "round"})
+    assert res.status_code == 200
+    data = res.json()
+    assert data["success"] is True
+    assert data["face_detected"] is True
+    assert len(data["top_alternatives"]) == 3
+
+def test_worn_frame_evaluation_base64_with_whitespace_and_newlines():
+    """Проверка устойчивости к пробелам, переводам строк и data-URI схеме"""
+    img_path = os.path.join(STATIC_DIR, "demo_faces", "wearing_round.jpg")
+    with open(img_path, "rb") as f:
+        raw_b64 = base64.b64encode(f.read()).decode("utf-8")
+    # Добавляем префикс, переводы строк и пробелы
+    formatted_b64 = f"data:image/jpeg;base64, \n {raw_b64[:100]} \r\n {raw_b64[100:]} \n "
+    
+    res = client.post("/api/analyze", json={"image_base64": formatted_b64, "frame_shape": "round"})
+    assert res.status_code == 200
+    data = res.json()
+    assert data["success"] is True
+    assert data["face_detected"] is True
+
+def test_analyze_invalid_base64_rejected():
+    """Проверка отклонения некорректного формата/паттерна base64"""
+    # 1. Недопустимые символы
+    res = client.post("/api/analyze", json={"image_base64": "data:image/jpeg;base64,@@@invalid_base64!!!"})
+    assert res.status_code in [400, 422]
+
+    # 2. Пустая строка
+    res2 = client.post("/api/analyze", json={"image_base64": ""})
+    assert res2.status_code in [400, 422]
+
+    # 3. Неверная схема
+    res3 = client.post("/api/analyze", json={"image_base64": "data:text/plain;base64,hello"})
+    assert res3.status_code in [400, 422]
+
 
 def test_branding_and_pwa_assets():
     # 1. Favicon
