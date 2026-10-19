@@ -90,7 +90,10 @@ class FaceMeshService:
         if not os.path.exists(MODEL_PATH):
             raise FileNotFoundError(f"MediaPipe model file not found at: {MODEL_PATH}")
         
-        base_options = python.BaseOptions(model_asset_path=MODEL_PATH)
+        base_options = python.BaseOptions(
+            model_asset_path=MODEL_PATH,
+            delegate=python.BaseOptions.Delegate.CPU
+        )
         options = vision.FaceLandmarkerOptions(
             base_options=base_options,
             output_face_blendshapes=False,

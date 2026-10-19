@@ -1,5 +1,17 @@
 [phases.setup]
-nixPkgs = ["libGL", "glib"]
+nixPkgs = ["...", "libGL", "glib", "mesa", "libglvnd"]
+nixLibs = ["...", "libGL", "glib", "mesa", "libglvnd"]
+aptPkgs = [
+  "...",
+  "libgl1",
+  "libegl1",
+  "libgles2",
+  "libglib2.0-0",
+  "libgomp1"
+]
+
+[variables]
+LD_LIBRARY_PATH = "/usr/lib/x86_64-linux-gnu:/usr/lib/aarch64-linux-gnu:$LD_LIBRARY_PATH"
 
 [start]
 cmd = "python run.py"
