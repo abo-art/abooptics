@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 160" width="100%" height="100%" fill="none">
+  <!-- Cat-Eye Dramatic Frame -->
+  <defs>
+    <linearGradient id="cat-tortoise" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#451a03"/>
+      <stop offset="25%" stop-color="#78350f"/>
+      <stop offset="50%" stop-color="#92400e"/>
+      <stop offset="75%" stop-color="#b45309"/>
+      <stop offset="100%" stop-color="#271005"/>
+    </linearGradient>
+    <linearGradient id="cat-lens" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f43f5e" stop-opacity="0.15"/>
+      <stop offset="50%" stop-color="#a855f7" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.15"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Left Temple Extension -->
+  <path d="M 24 38 L 4 36 C 2 36 0 37 0 40 L 0 46 C 0 49 2 50 4 50 L 28 48 Z" fill="url(#cat-tortoise)"/>
+  <!-- Right Temple Extension -->
+  <path d="M 376 38 L 396 36 C 398 36 400 37 400 40 L 400 46 C 400 49 398 50 396 50 L 372 48 Z" fill="url(#cat-tortoise)"/>
+
+  <!-- Left Cat-Eye Wing & Lens -->
+  <path d="M 24 34 C 70 42 135 44 178 50 C 182 75 174 118 126 126 C 75 132 44 98 42 66 C 36 50 24 36 24 34 Z" fill="url(#cat-lens)"/>
+  <path d="M 24 34 C 70 42 135 44 178 50 C 182 75 174 118 126 126 C 75 132 44 98 42 66 C 36 50 24 36 24 34 Z" stroke="url(#cat-tortoise)" stroke-width="8" stroke-linejoin="round"/>
+  <!-- Left Wing Golden Accent -->
+  <path d="M 24 34 L 52 38 L 42 48 Z" fill="#fbbf24"/>
+
+  <!-- Left Glare -->
+  <path d="M 50 44 L 95 44 L 65 118 L 48 118 Z" fill="#ffffff" opacity="0.15"/>
+
+  <!-- Bridge -->
+  <path d="M 176 58 C 188 50 212 50 224 58" stroke="url(#cat-tortoise)" stroke-width="7.5" stroke-linecap="round"/>
+
+  <!-- Right Cat-Eye Wing & Lens -->
+  <path d="M 376 34 C 330 42 265 44 222 50 C 218 75 226 118 274 126 C 325 132 356 98 358 66 C 364 50 376 36 376 34 Z" fill="url(#cat-lens)"/>
+  <path d="M 376 34 C 330 42 265 44 222 50 C 218 75 226 118 274 126 C 325 132 356 98 358 66 C 364 50 376 36 376 34 Z" stroke="url(#cat-tortoise)" stroke-width="8" stroke-linejoin="round"/>
+  <!-- Right Wing Golden Accent -->
+  <path d="M 376 34 L 348 38 L 358 48 Z" fill="#fbbf24"/>
+
+  <!-- Right Glare -->
+  <path d="M 255 44 L 300 44 L 270 118 L 253 118 Z" fill="#ffffff" opacity="0.15"/>
+
+  <!-- Integrated Acetate Nose Pads -->
+  <path d="M 174 68 C 172 78 174 88 178 94" stroke="url(#cat-tortoise)" stroke-width="5" stroke-linecap="round"/>
+  <path d="M 226 68 C 228 78 226 88 222 94" stroke="url(#cat-tortoise)" stroke-width="5" stroke-linecap="round"/>
+</svg>

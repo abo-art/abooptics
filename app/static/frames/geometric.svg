@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 160" width="100%" height="100%" fill="none">
+  <!-- Geometric Hexagonal Frame -->
+  <defs>
+    <linearGradient id="geo-silver" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#94a3b8"/>
+      <stop offset="50%" stop-color="#cbd5e1"/>
+      <stop offset="100%" stop-color="#64748b"/>
+    </linearGradient>
+    <linearGradient id="geo-lens" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.2"/>
+      <stop offset="50%" stop-color="#a78bfa" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#818cf8" stop-opacity="0.15"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Left Temple Extension -->
+  <path d="M 36 60 L 8 58 C 6 58 4 59 4 62 L 4 66 C 4 68 6 70 8 70 L 36 68 Z" fill="url(#geo-silver)"/>
+  <!-- Right Temple Extension -->
+  <path d="M 364 60 L 392 58 C 394 58 396 59 396 62 L 396 66 C 396 68 394 70 392 70 L 364 68 Z" fill="url(#geo-silver)"/>
+
+  <!-- Left Hexagon -->
+  <polygon points="65,36 150,36 182,78 150,126 65,126 36,78" fill="url(#geo-lens)"/>
+  <polygon points="65,36 150,36 182,78 150,126 65,126 36,78" stroke="url(#geo-silver)" stroke-width="5" stroke-linejoin="round"/>
+  <!-- Glare -->
+  <path d="M 72 40 L 115 40 L 82 120 L 64 120 Z" fill="#ffffff" opacity="0.15"/>
+
+  <!-- Straight Angular Bridge -->
+  <path d="M 182 72 L 218 72" stroke="url(#geo-silver)" stroke-width="4.5" stroke-linecap="round"/>
+
+  <!-- Right Hexagon -->
+  <polygon points="250,36 335,36 364,78 335,126 250,126 218,78" fill="url(#geo-lens)"/>
+  <polygon points="250,36 335,36 364,78 335,126 250,126 218,78" stroke="url(#geo-silver)" stroke-width="5" stroke-linejoin="round"/>
+  <!-- Glare -->
+  <path d="M 258 40 L 301 40 L 268 120 L 250 120 Z" fill="#ffffff" opacity="0.15"/>
+
+  <!-- Minimalist Nose Pads -->
+  <ellipse cx="184" cy="86" rx="3" ry="6" fill="#e2e8f0"/>
+  <ellipse cx="216" cy="86" rx="3" ry="6" fill="#e2e8f0"/>
+</svg>

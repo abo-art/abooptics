@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>abooptika — Анализ посадки оправы и геометрии лица</title>
+  <meta name="description" content="Инструмент оптического подбора: биометрическое сканирование лица, анализ посадки оправы и подбор альтернативных моделей для примерки в салоне.">
+  
+  <!-- Favicon & PWA Icons for iOS / Android Home Screen -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="apple-mobile-web-app-title" content="abooptika">
+  <meta name="application-name" content="abooptika">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#0C2662">
+  <meta name="msapplication-TileColor" content="#0C2662">
+
+  <!-- Google Fonts: Plus Jakarta Sans & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+          },
+          colors: {
+            navy: {
+              50: '#F0F4FA',
+              100: '#E2E9F6',
+              200: '#C7D6ED',
+              300: '#9FBADF',
+              400: '#6C97CD',
+              500: '#4376B9',
+              600: '#2E5CA1',
+              700: '#234780',
+              800: '#19345E',
+              900: '#0C2662', /* Фирменный глубокий тёмно-синий из логотипа */
+              950: '#071840',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom Styles: White & Dark Navy Blue -->
+  <link rel="stylesheet" href="/static/css/custom.css">
+</head>
+<body class="bg-[#F8FAFC] text-slate-800 min-h-screen font-sans antialiased selection:bg-navy-900 selection:text-white flex flex-col">
+
+  <!-- ================= TOP NAVIGATION HEADER ================= -->
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-navy-900/10 px-4 py-3 sm:px-6 shadow-sm">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      
+      <!-- Brand Logo (Official Logo with 'oo' spectacles) -->
+      <div class="flex items-center gap-3">
+        <a href="/" class="flex items-center group">
+          <img src="/static/images/brand/logo.png" alt="abooptika" class="h-7 sm:h-8 w-auto object-contain transition-transform group-hover:scale-[1.02]">
+          <span class="hidden sm:inline-block ml-3 pl-3 border-l border-navy-900/15 text-[11px] font-bold tracking-wider uppercase text-navy-900/70">
+            Оптический анализ посадки
+          </span>
+        </a>
+      </div>
+
+      <!-- Mode Selector (Consultant terminal toggle) -->
+      <div class="flex items-center gap-3">
+        <label class="flex items-center gap-2 cursor-pointer bg-navy-50/80 hover:bg-navy-100/70 px-3 py-1.5 rounded-xl border border-navy-900/15 transition-all">
+          <input type="checkbox" id="salon-mode-toggle" class="sr-only peer">
+          <div class="w-8 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-navy-900 relative"></div>
+          <span class="text-xs font-semibold text-navy-900 select-none">Режим консультанта</span>
+        </label>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ================= B2B SALON CONSULTANT BANNER ================= -->
+  <div id="salon-banner" class="hidden bg-navy-50 border-b border-navy-900/15 px-4 py-2 text-xs text-navy-900 flex items-center justify-between max-w-6xl mx-auto w-full">
+    <div class="flex items-center gap-2">
+      <span class="inline-block w-2 h-2 rounded-full bg-navy-900"></span>
+      <span class="font-bold">Терминал оптометриста / Салон Dostyk Plaza</span>
+    </div>
+    <div class="text-[11px] text-slate-500 font-medium">Инструмент подбора и оценки посадки в торговом зале</div>
+  </div>
+
+  <!-- ================= MAIN VIEW CONTAINER ================= -->
+  <main class="flex-1 max-w-5xl mx-auto w-full px-4 py-6 sm:py-8 flex flex-col items-center">
+
+    <!-- ================= SCREEN 1: SCAN & CAMERA ================= -->
+    <section id="screen-scan" class="w-full max-w-md mx-auto flex flex-col items-center">
+      
+      <!-- Screen Header -->
+      <div class="text-center mb-5">
+        <h1 class="text-2xl font-display font-extrabold text-navy-900 tracking-tight mb-1.5">
+          Оценка посадки оправы
+        </h1>
+        <p class="text-xs text-slate-600 max-w-sm mx-auto leading-relaxed">
+          Наденьте оправу с витрины и наведите фронтальную камеру для биометрического замера геометрии лица и ширины оправы
+        </p>
+      </div>
+
+      <!-- CAMERA VIEWFINDER CARD -->
+      <div class="w-full relative rounded-2xl overflow-hidden border border-navy-900/15 shadow-xl bg-slate-900 aspect-[3/4] max-h-[480px] flex items-center justify-center" id="camera-container">
+        
+        <!-- Camera Video Stream (Прямое сопоставление движений 1:1) -->
+        <video id="camera-video" playsinline autoplay muted style="transform: scaleX(-1); -webkit-transform: scaleX(-1);" class="w-full h-full object-cover hidden"></video>
+
+        <!-- Hidden canvas for capturing snapshot -->
+        <canvas id="capture-canvas" class="hidden"></canvas>
+
+        <!-- Visual Oval Guide & Laser -->
+        <div class="absolute inset-0 pointer-events-none flex flex-col items-center justify-center p-6 z-10">
+          <div class="w-56 sm:w-60 h-72 sm:h-76 scanner-oval relative flex items-center justify-center">
+            <div class="scanner-laser"></div>
+            <div class="w-2.5 h-2.5 rounded-full border border-navy-900/60 opacity-60"></div>
+          </div>
+          
+          <div id="camera-guide-badge" class="mt-4 px-3.5 py-1 rounded-full bg-white/95 text-navy-900 shadow-md border border-navy-900/15 text-[11px] font-bold">
+            Лицо в надетой оправе внутри овала
+          </div>
+        </div>
+
+        <!-- Camera Placeholder -->
+        <div id="camera-placeholder" class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-20 bg-white/95 backdrop-blur-sm">
+          <div class="w-14 h-14 rounded-2xl bg-navy-50 border border-navy-900/15 flex items-center justify-center text-navy-900 mb-3.5 shadow-sm">
+            <svg class="w-7 h-7 text-navy-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+          </div>
+          <h3 class="text-sm font-bold text-navy-900 mb-1">Камера устройства</h3>
+          <p class="text-xs text-slate-500 max-w-xs mb-4">
+            Включите камеру смартфона или планшета стойки
+          </p>
+          <button id="btn-start-camera" class="btn-brand-primary w-full max-w-xs py-2.5 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2">
+            Включить камеру
+          </button>
+        </div>
+
+        <!-- In-view camera controls -->
+        <div id="camera-active-controls" class="hidden absolute top-3 right-3 z-30 flex items-center gap-2">
+          <button id="btn-toggle-mirror" title="Сменить зеркальный режим" class="py-1 px-3 rounded-full bg-white/95 text-navy-900 border border-navy-900/20 text-xs font-bold shadow-md hover:bg-navy-50 transition-colors">
+            Оси: 1:1
+          </button>
+          <button id="btn-flip-camera" title="Переключить камеру" class="py-1 px-3 rounded-full bg-white/95 text-navy-900 border border-navy-900/20 text-xs font-bold shadow-md hover:bg-navy-50 transition-colors">
+            Камера
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Action Capture Buttons -->
+      <div class="w-full mt-4 flex flex-col gap-2">
+        <button id="btn-capture" disabled class="btn-brand-primary w-full py-3.5 px-5 rounded-xl font-bold text-xs tracking-wide flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
+          Выполнить биометрическое сканирование
+        </button>
+
+        <label class="btn-brand-outline w-full py-2.5 px-4 rounded-xl text-xs font-bold cursor-pointer text-center">
+          Загрузить фото примерки из галереи
+          <input type="file" id="file-input" accept="image/*" class="hidden">
+        </label>
+      </div>
+
+      <!-- Quick Demo Presets -->
+      <div class="w-full mt-5 pt-4 border-t border-navy-900/10">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-[11px] font-bold text-navy-900/70 uppercase tracking-wider">Тестовые сценарии примерки:</span>
+          <span class="text-[10px] font-bold text-navy-900 bg-navy-50 px-2 py-0.5 rounded border border-navy-900/10">1-клик тест</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <button id="btn-demo-wearing-square" class="p-3 rounded-xl bg-white hover:bg-navy-50/50 border border-navy-900/15 text-left transition-all shadow-sm hover:border-navy-900/30">
+            <div class="text-xs font-bold text-navy-900">В квадратной оправе</div>
+            <div class="text-[10px] font-semibold text-amber-700 mt-0.5">Ширина 143 мм (Широковата)</div>
+          </button>
+          <button id="btn-demo-wearing-round" class="p-3 rounded-xl bg-white hover:bg-navy-50/50 border border-navy-900/15 text-left transition-all shadow-sm hover:border-navy-900/30">
+            <div class="text-xs font-bold text-navy-900">В круглой оправе</div>
+            <div class="text-[10px] font-semibold text-emerald-700 mt-0.5">Ширина 135 мм (Соответствует)</div>
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ================= SCREEN 2: PROCESSING / LOADING ================= -->
+    <section id="screen-loading" class="hidden w-full max-w-md mx-auto py-16 flex flex-col items-center text-center">
+      <!-- Official Logo on loading screen with subtle pulse -->
+      <img src="/static/images/brand/logo.png" alt="abooptika" class="h-10 sm:h-12 w-auto object-contain mx-auto mb-5 animate-pulse">
+
+      <div class="w-10 h-10 rounded-full border-3 border-navy-900/20 border-t-navy-900 animate-spin mb-4"></div>
+
+      <h3 class="text-base font-bold text-navy-900 mb-1">Биометрический расчет</h3>
+      <p id="loading-step-text" class="text-xs text-navy-700 max-w-xs h-8 font-medium">
+        Поиск ключевых точек MediaPipe Face Mesh...
+      </p>
+    </section>
+
+    <!-- ================= SCREEN 3: RESULTS (ЧИСТАЯ АНАЛИТИКА) ================= -->
+    <section id="screen-results" class="hidden w-full flex flex-col gap-5">
+
+      <!-- ================= 1. КАДР ПРИМЕРКИ И БИОМЕТРИЯ ЛИЦА ================= -->
+      <div class="brand-card rounded-2xl p-5 flex flex-col sm:flex-row items-center sm:items-start gap-4">
+        
+        <!-- Чистый реальный снимок примерки -->
+        <div class="relative w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden border border-navy-900/15 shadow-sm shrink-0 bg-slate-100">
+          <img id="client-real-photo" src="" alt="Фото примерки" class="w-full h-full object-cover">
+        </div>
+
+        <!-- Биометрические замеры лица -->
+        <div class="flex-1 w-full text-center sm:text-left">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1.5">
+            <div>
+              <span class="text-[10px] text-navy-900/60 uppercase tracking-wider font-bold block">Анатомический тип лица</span>
+              <h3 id="diag-shape-title" class="text-lg font-extrabold text-navy-900">Квадратное лицо</h3>
+            </div>
+            <span id="diag-shape-confidence" class="self-center sm:self-auto text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-200">
+              98% точность
+            </span>
+          </div>
+
+          <p id="diag-shape-desc" class="text-xs text-slate-600 leading-relaxed mb-3">
+            Ширина челюсти составляет 90% и более от ширины скул. Угол челюсти выражен и близок к прямому.
+          </p>
+
+          <!-- Таблица точных замеров -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+            <div class="bg-navy-50/70 p-2.5 rounded-xl border border-navy-900/10">
+              <span class="text-[10px] text-slate-500 font-medium block">Длина / Скулы</span>
+              <span id="metric-hw" class="font-extrabold text-navy-900 text-sm">1.25</span>
+            </div>
+            <div class="bg-navy-50/70 p-2.5 rounded-xl border border-navy-900/10">
+              <span class="text-[10px] text-slate-500 font-medium block">Челюсть / Скулы</span>
+              <span id="metric-jc" class="font-extrabold text-navy-900 text-sm">0.92</span>
+            </div>
+            <div class="bg-navy-50/70 p-2.5 rounded-xl border border-navy-900/10">
+              <span class="text-[10px] text-slate-500 font-medium block">Угол челюсти</span>
+              <span id="metric-chin" class="font-extrabold text-navy-900 text-sm">170°</span>
+            </div>
+            <div class="bg-navy-50/70 p-2.5 rounded-xl border border-navy-900/10">
+              <span class="text-[10px] text-slate-500 font-medium block">Симметрия</span>
+              <span id="metric-sym" class="font-extrabold text-emerald-700 text-sm">97.5%</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ================= 2. ОЦЕНКА ТЕКУЩЕГО ВЫБОРА (ВЕРДИКТ ОПТОМЕТРИСТА) ================= -->
+      <div id="verdict-card" class="brand-card rounded-2xl p-5 sm:p-6 border-2 border-navy-900/20 shadow-md">
+        
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pb-3.5 border-b border-navy-900/10">
+          <div>
+            <span class="text-[10px] uppercase tracking-wider text-navy-900/60 font-bold block">Оценка посадки надетой оправы</span>
+            <h2 id="worn-shape-name" class="text-base sm:text-lg font-extrabold text-navy-900 mt-0.5">
+              Квадратная оправа
+            </h2>
+          </div>
+
+          <div class="flex items-center gap-2 bg-navy-50 px-3 py-1.5 rounded-xl border border-navy-900/15">
+            <span class="text-xs text-navy-900/70 font-semibold">Совместимость:</span>
+            <span id="worn-compatibility-score" class="text-xl font-extrabold text-navy-900">80%</span>
+            <span id="worn-match-badge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-white text-navy-900 border border-navy-900/15 shadow-sm">
+              Есть нюансы
+            </span>
+          </div>
+        </div>
+
+        <!-- Заключение стилиста / оптометриста -->
+        <div class="my-4 p-4 rounded-xl bg-navy-50 border-l-4 border-navy-900 text-xs">
+          <span class="text-[10px] text-navy-900 uppercase tracking-wider font-extrabold block mb-1">Заключение оптометриста:</span>
+          <p id="stylist-quote" class="text-navy-950 font-medium leading-relaxed">
+            Оправа «Квадратная»: совместимость 80%. По высоте сидит правильно, но ширина (143 мм) шире скул на 8 мм.
+          </p>
+        </div>
+
+        <!-- 3 точных показателя посадки -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          <div class="bg-white p-3.5 rounded-xl border border-navy-900/10 shadow-sm">
+            <div class="flex items-center justify-between text-xs mb-1">
+              <span class="text-slate-500 font-medium">Ширина оправы</span>
+              <span id="fit-width-status" class="font-bold text-amber-700">Широковата</span>
+            </div>
+            <p id="fit-width-desc" class="text-[11px] text-slate-700">Превышает скулы на +8 мм</p>
+          </div>
+
+          <div class="bg-white p-3.5 rounded-xl border border-navy-900/10 shadow-sm">
+            <div class="flex items-center justify-between text-xs mb-1">
+              <span class="text-slate-500 font-medium">Положение зрачков</span>
+              <span id="fit-pupil-status" class="font-bold text-emerald-700">Идеально</span>
+            </div>
+            <p id="fit-pupil-desc" class="text-[11px] text-slate-700">На оптической оси светового проема</p>
+          </div>
+
+          <div class="bg-white p-3.5 rounded-xl border border-navy-900/10 shadow-sm">
+            <div class="flex items-center justify-between text-xs mb-1">
+              <span class="text-slate-500 font-medium">Линия бровей</span>
+              <span id="fit-eyebrow-status" class="font-bold text-emerald-700">Гармонично</span>
+            </div>
+            <p id="fit-eyebrow-desc" class="text-[11px] text-slate-700">По нижней границе надбровной дуги</p>
+          </div>
+        </div>
+
+        <!-- Анатомические соответствия и риски -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3.5 pt-3.5 border-t border-navy-900/10 text-xs">
+          <div>
+            <strong class="text-navy-900 text-[11px] uppercase tracking-wider block mb-1">Соответствия:</strong>
+            <ul id="pros-list" class="text-slate-700 space-y-1 list-disc list-inside">
+              <li>Ширина рамки выровнена по височной линии скул</li>
+            </ul>
+          </div>
+          <div>
+            <strong class="text-navy-900 text-[11px] uppercase tracking-wider block mb-1">Отклонения и риски:</strong>
+            <ul id="cons-list" class="text-slate-700 space-y-1 list-disc list-inside">
+              <li>Оправа выступает за височную линию, заушники будут оттопыриваться</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ================= 3. ТОП-3 АЛЬТЕРНАТИВЫ ИЗ КАТАЛОГА ОПТИКИ ================= -->
+      <div class="w-full flex flex-col gap-3">
+        <div>
+          <h3 class="text-lg font-display font-extrabold text-navy-900">
+            Рекомендованные модели для примерки в салоне
+          </h3>
+          <p class="text-xs text-slate-500">
+            Оправы из ассортимента салона с выверенной геометрической компенсацией для вашего типа лица
+          </p>
+        </div>
+
+        <!-- Top-3 Alternatives Cards Grid (Only Text & Pure Data!) -->
+        <div id="alternatives-container" class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+          <!-- Dynamically populated by app.js -->
+        </div>
+      </div>
+
+      <!-- STICKY ACTION BUTTONS BAR -->
+      <div class="sticky bottom-4 z-40 w-full max-w-xl mx-auto brand-panel p-2.5 rounded-2xl border border-navy-900/15 shadow-xl flex items-center justify-between gap-2">
+        <button id="btn-open-pass" class="btn-brand-primary flex-1 py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5">
+          Показать консультанту в зале
+        </button>
+
+        <button id="btn-new-scan" class="btn-brand-outline py-2.5 px-4 rounded-xl text-xs font-bold transition-all">
+          Новый скан
+        </button>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ================= MODAL: ПАСПОРТ ПОДБОРА ДЛЯ КОНСУЛЬТАНТА ================= -->
+  <div id="pass-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-lg rounded-2xl p-6 border border-navy-900/20 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+      <button id="btn-close-pass" class="absolute top-4 right-4 text-slate-400 hover:text-navy-900 no-print text-sm font-bold">
+        Закрыть
+      </button>
+
+      <div id="pass-content">
+        <!-- Dynamically rendered by app.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="mt-auto border-t border-navy-900/10 bg-white py-5 px-4 text-[12px] text-slate-500">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <img src="/static/images/brand/logo.png" alt="abooptika" class="h-6 w-auto object-contain opacity-90">
+        <span>© 2026 abooptika. Профессиональный инструмент оптического подбора в салоне.</span>
+      </div>
+      <div class="text-navy-900/60 font-semibold text-[11px]">
+        MediaPipe Face Mesh • Геометрический анализ посадки
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="/static/js/camera.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

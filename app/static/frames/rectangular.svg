@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 160" width="100%" height="100%" fill="none">
+  <!-- Rectangular Minimalist Frame -->
+  <defs>
+    <linearGradient id="rec-metal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#374151"/>
+      <stop offset="50%" stop-color="#111827"/>
+      <stop offset="100%" stop-color="#1f2937"/>
+    </linearGradient>
+    <linearGradient id="lens-glare" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.25"/>
+      <stop offset="35%" stop-color="#38bdf8" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#818cf8" stop-opacity="0.15"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Left Temple Extension -->
+  <path d="M 30 52 L 8 48 C 6 48 4 49 4 52 L 4 56 C 4 58 6 60 8 60 L 30 56 Z" fill="url(#rec-metal)"/>
+  <!-- Right Temple Extension -->
+  <path d="M 370 52 L 392 48 C 394 48 396 49 396 52 L 396 56 C 396 58 394 60 392 60 L 370 56 Z" fill="url(#rec-metal)"/>
+
+  <!-- Left Lens Glass -->
+  <rect x="36" y="38" width="146" height="84" rx="16" fill="url(#lens-glare)"/>
+  <!-- Left Lens Glare Highlight -->
+  <path d="M 50 44 L 110 44 L 60 114 L 46 114 Z" fill="#ffffff" opacity="0.12"/>
+
+  <!-- Left Outer Rim -->
+  <rect x="34" y="36" width="150" height="88" rx="18" stroke="url(#rec-metal)" stroke-width="6.5" stroke-linejoin="round"/>
+  <!-- Left Inner Rim Accent -->
+  <rect x="37" y="39" width="144" height="82" rx="15" stroke="#4b5563" stroke-width="1.2" opacity="0.7"/>
+
+  <!-- Bridge -->
+  <path d="M 184 62 C 192 56 208 56 216 62" stroke="url(#rec-metal)" stroke-width="7" stroke-linecap="round"/>
+  <path d="M 187 64 C 193 60 207 60 213 64" stroke="#6b7280" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Nose Pads -->
+  <path d="M 182 78 C 180 84 180 94 183 98" stroke="#9ca3af" stroke-width="3" stroke-linecap="round"/>
+  <ellipse cx="182" cy="88" rx="3.5" ry="7" fill="#e5e7eb" opacity="0.85"/>
+  <path d="M 218 78 C 220 84 220 94 217 98" stroke="#9ca3af" stroke-width="3" stroke-linecap="round"/>
+  <ellipse cx="218" cy="88" rx="3.5" ry="7" fill="#e5e7eb" opacity="0.85"/>
+
+  <!-- Right Lens Glass -->
+  <rect x="218" y="38" width="146" height="84" rx="16" fill="url(#lens-glare)"/>
+  <!-- Right Lens Glare Highlight -->
+  <path d="M 232 44 L 292 44 L 242 114 L 228 114 Z" fill="#ffffff" opacity="0.12"/>
+
+  <!-- Right Outer Rim -->
+  <rect x="216" y="36" width="150" height="88" rx="18" stroke="url(#rec-metal)" stroke-width="6.5" stroke-linejoin="round"/>
+  <!-- Right Inner Rim Accent -->
+  <rect x="219" y="39" width="144" height="82" rx="15" stroke="#4b5563" stroke-width="1.2" opacity="0.7"/>
+
+  <!-- Subtle Hinge Rivets -->
+  <circle cx="28" cy="54" r="2" fill="#d1d5db"/>
+  <circle cx="372" cy="54" r="2" fill="#d1d5db"/>
+</svg>

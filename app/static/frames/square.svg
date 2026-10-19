@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 160" width="100%" height="100%" fill="none">
+  <!-- Square Bold Black Frame -->
+  <defs>
+    <linearGradient id="sqr-black" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#18181b"/>
+      <stop offset="40%" stop-color="#27272a"/>
+      <stop offset="70%" stop-color="#09090b"/>
+      <stop offset="100%" stop-color="#18181b"/>
+    </linearGradient>
+    <linearGradient id="sqr-lens" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.2"/>
+      <stop offset="60%" stop-color="#818cf8" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#0284c7" stop-opacity="0.15"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Left Temple Extension -->
+  <path d="M 32 48 L 6 46 C 4 46 2 48 2 51 L 2 59 C 2 62 4 64 6 64 L 32 62 Z" fill="url(#sqr-black)"/>
+  <!-- Right Temple Extension -->
+  <path d="M 368 48 L 394 46 C 396 46 398 48 398 51 L 398 59 C 398 62 396 64 394 64 L 368 62 Z" fill="url(#sqr-black)"/>
+
+  <!-- Left Square Lens -->
+  <rect x="36" y="32" width="144" height="96" rx="10" fill="url(#sqr-lens)"/>
+  <path d="M 52 38 L 105 38 L 65 120 L 48 120 Z" fill="#ffffff" opacity="0.15"/>
+  <!-- Left Outer Thick Rim -->
+  <rect x="34" y="30" width="148" height="100" rx="12" stroke="url(#sqr-black)" stroke-width="8" stroke-linejoin="round"/>
+
+  <!-- Thick Bridge -->
+  <path d="M 182 56 C 190 52 210 52 218 56" stroke="url(#sqr-black)" stroke-width="9" stroke-linecap="round"/>
+
+  <!-- Right Square Lens -->
+  <rect x="220" y="32" width="144" height="96" rx="10" fill="url(#sqr-lens)"/>
+  <path d="M 236 38 L 289 38 L 249 120 L 232 120 Z" fill="#ffffff" opacity="0.15"/>
+  <!-- Right Outer Thick Rim -->
+  <rect x="218" y="30" width="148" height="100" rx="12" stroke="url(#sqr-black)" stroke-width="8" stroke-linejoin="round"/>
+
+  <!-- Iconic Corner Rivets -->
+  <circle cx="28" cy="46" r="2.2" fill="#e4e4e7"/>
+  <circle cx="28" cy="54" r="2.2" fill="#e4e4e7"/>
+  <circle cx="372" cy="46" r="2.2" fill="#e4e4e7"/>
+  <circle cx="372" cy="54" r="2.2" fill="#e4e4e7"/>
+</svg>

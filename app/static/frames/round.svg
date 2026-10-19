@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 160" width="100%" height="100%" fill="none">
+  <!-- Round Vintage Keyhole Frame -->
+  <defs>
+    <linearGradient id="round-amber" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#b45309"/>
+      <stop offset="35%" stop-color="#d97706"/>
+      <stop offset="70%" stop-color="#78350f"/>
+      <stop offset="100%" stop-color="#92400e"/>
+    </linearGradient>
+    <linearGradient id="round-lens" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.2"/>
+      <stop offset="50%" stop-color="#818cf8" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#c084fc" stop-opacity="0.15"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Left Temple Extension -->
+  <path d="M 44 72 L 10 70 C 8 70 6 71 6 73 L 6 77 C 6 79 8 80 10 80 L 44 78 Z" fill="url(#round-amber)"/>
+  <!-- Right Temple Extension -->
+  <path d="M 356 72 L 390 70 C 392 70 394 71 394 73 L 394 77 C 394 79 392 80 390 80 L 356 78 Z" fill="url(#round-amber)"/>
+
+  <!-- Left Circular Lens -->
+  <circle cx="112" cy="78" r="54" fill="url(#round-lens)"/>
+  <!-- Left Lens Glare -->
+  <path d="M 80 44 L 120 44 L 90 114 L 70 114 Z" fill="#ffffff" opacity="0.15"/>
+  <!-- Left Circular Rim -->
+  <circle cx="112" cy="78" r="54" stroke="url(#round-amber)" stroke-width="7"/>
+
+  <!-- Vintage Keyhole Bridge -->
+  <path d="M 166 76 C 172 62 186 52 200 52 C 214 52 228 62 234 76 C 226 78 220 86 222 96 C 214 90 208 88 200 88 C 192 88 186 90 178 96 C 180 86 174 78 166 76 Z" fill="url(#round-amber)"/>
+
+  <!-- Right Circular Lens -->
+  <circle cx="288" cy="78" r="54" fill="url(#round-lens)"/>
+  <!-- Right Lens Glare -->
+  <path d="M 256 44 L 296 44 L 266 114 L 246 114 Z" fill="#ffffff" opacity="0.15"/>
+  <!-- Right Circular Rim -->
+  <circle cx="288" cy="78" r="54" stroke="url(#round-amber)" stroke-width="7"/>
+
+  <!-- Front Rivets -->
+  <circle cx="54" cy="75" r="2" fill="#fef08a"/>
+  <circle cx="346" cy="75" r="2" fill="#fef08a"/>
+</svg>

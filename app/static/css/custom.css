@@ -1,0 +1,181 @@
+/* ==========================================================================
+   abooptika — Фирменная дизайн-система: Pure White & Dark Navy Blue
+   Вдохновлено стандартами премиальной оптической индустрии и медицинской эстетики
+   ========================================================================== */
+
+:root {
+  --navy-primary: #0C2662;
+  --navy-dark: #071840;
+  --navy-light: #1E3A8A;
+  --navy-tint: #F0F4FA;
+  --navy-soft: #E8EEF8;
+  --navy-border: rgba(12, 38, 98, 0.12);
+  --navy-shadow: rgba(12, 38, 98, 0.08);
+
+  --bg-white: #FFFFFF;
+  --bg-page: #F8FAFC;
+  --bg-card: #FFFFFF;
+
+  --text-navy: #0C2662;
+  --text-main: #1E293B;
+  --text-muted: #64748B;
+  --text-subtle: #94A3B8;
+
+  --status-emerald: #059669;
+  --status-emerald-bg: #ECFDF5;
+  --status-amber: #D97706;
+  --status-amber-bg: #FFFBEB;
+}
+
+/* Base Body Styles */
+body {
+  background-color: var(--bg-page);
+  color: var(--text-main);
+}
+
+/* Brand Panels & Cards */
+.brand-panel {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--navy-border);
+  box-shadow: 0 2px 10px var(--navy-shadow);
+}
+
+.brand-card {
+  background: var(--bg-card);
+  border: 1px solid var(--navy-border);
+  box-shadow: 0 4px 18px -2px var(--navy-shadow);
+}
+
+.brand-card-hover {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.brand-card-hover:hover {
+  transform: translateY(-2px);
+  border-color: rgba(12, 38, 98, 0.28);
+  box-shadow: 0 10px 28px -4px rgba(12, 38, 98, 0.14);
+}
+
+/* Primary Brand Button */
+.btn-brand-primary {
+  background-color: var(--navy-primary);
+  color: #FFFFFF;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 4px 14px rgba(12, 38, 98, 0.18);
+}
+
+.btn-brand-primary:hover:not(:disabled) {
+  background-color: var(--navy-dark);
+  box-shadow: 0 6px 20px rgba(12, 38, 98, 0.28);
+  transform: translateY(-1px);
+}
+
+.btn-brand-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Secondary Brand Button */
+.btn-brand-outline {
+  background-color: #FFFFFF;
+  color: var(--navy-primary);
+  border: 1.5px solid var(--navy-primary);
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-brand-outline:hover {
+  background-color: var(--navy-tint);
+  border-color: var(--navy-dark);
+  color: var(--navy-dark);
+}
+
+/* ==========================================================================
+   Ориентация видеопотока фронтальной камеры:
+   Движения пользователя совпадают с экраном 1:1 (рука влево -> на экране влево)
+   ========================================================================== */
+#camera-video {
+  transform: scaleX(-1);
+  -webkit-transform: scaleX(-1);
+}
+
+/* Camera Laser Line (Deep Navy Optical Precision) */
+@keyframes navy-scanline {
+  0% {
+    top: 6%;
+    opacity: 0.95;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    top: 92%;
+    opacity: 0.95;
+  }
+}
+
+.scanner-laser {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  height: 2.5px;
+  background: linear-gradient(90deg, transparent, #0C2662, #1E40AF, #0C2662, transparent);
+  box-shadow: 0 0 12px 2px rgba(12, 38, 98, 0.5), 0 0 4px 1px rgba(30, 64, 175, 0.6);
+  animation: navy-scanline 2.2s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 20;
+}
+
+/* Oval Scanner Guide Pulse */
+@keyframes navy-oval-pulse {
+  0%, 100% {
+    border-color: rgba(12, 38, 98, 0.7);
+    box-shadow: 0 0 0 0 rgba(12, 38, 98, 0.25), inset 0 0 16px rgba(12, 38, 98, 0.08);
+  }
+  50% {
+    border-color: #0C2662;
+    box-shadow: 0 0 0 8px rgba(12, 38, 98, 0), inset 0 0 24px rgba(12, 38, 98, 0.16);
+  }
+}
+
+.scanner-oval {
+  border: 2px dashed rgba(12, 38, 98, 0.75);
+  border-radius: 50% / 46%;
+  animation: navy-oval-pulse 3s infinite ease-in-out;
+}
+
+/* Custom Clean Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* Print Styles for Consultant Voucher */
+@media print {
+  body {
+    background: #FFFFFF !important;
+    color: #0C2662 !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  .brand-card, .brand-panel {
+    background: #FFFFFF !important;
+    border: 1px solid #CBD5E1 !important;
+    color: #0C2662 !important;
+    box-shadow: none !important;
+  }
+}

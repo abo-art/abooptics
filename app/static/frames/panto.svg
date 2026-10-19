@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 160" width="100%" height="100%" fill="none">
+  <!-- Panto High-Hinge Intellectual Frame -->
+  <defs>
+    <linearGradient id="panto-titan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#475569"/>
+      <stop offset="50%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#334155"/>
+    </linearGradient>
+    <linearGradient id="panto-lens" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.2"/>
+      <stop offset="50%" stop-color="#67e8f9" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#818cf8" stop-opacity="0.15"/>
+    </linearGradient>
+  </defs>
+
+  <!-- High Hinges / Temple Extensions -->
+  <path d="M 38 42 L 10 40 C 8 40 6 41 6 43 L 6 47 C 6 49 8 50 10 50 L 38 48 Z" fill="url(#panto-titan)"/>
+  <path d="M 362 42 L 390 40 C 392 40 394 41 394 43 L 394 47 C 394 49 392 50 390 50 L 362 48 Z" fill="url(#panto-titan)"/>
+
+  <!-- Left Panto Lens (Flat top, rounded bottom) -->
+  <path d="M 52 44 C 85 38 135 38 170 44 C 182 62 178 114 140 128 C 95 134 46 116 44 80 C 44 58 48 48 52 44 Z" fill="url(#panto-lens)"/>
+  <path d="M 52 44 C 85 38 135 38 170 44 C 182 62 178 114 140 128 C 95 134 46 116 44 80 C 44 58 48 48 52 44 Z" stroke="url(#panto-titan)" stroke-width="5.5" stroke-linejoin="round"/>
+  <!-- Glare -->
+  <path d="M 68 46 L 112 46 L 82 120 L 64 120 Z" fill="#ffffff" opacity="0.15"/>
+
+  <!-- High Curved Bridge -->
+  <path d="M 170 46 C 182 40 218 40 230 46" stroke="url(#panto-titan)" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- Right Panto Lens -->
+  <path d="M 348 44 C 315 38 265 38 230 44 C 218 62 222 114 260 128 C 305 134 354 116 356 80 C 356 58 352 48 348 44 Z" fill="url(#panto-lens)"/>
+  <path d="M 348 44 C 315 38 265 38 230 44 C 218 62 222 114 260 128 C 305 134 354 116 356 80 C 356 58 352 48 348 44 Z" stroke="url(#panto-titan)" stroke-width="5.5" stroke-linejoin="round"/>
+  <!-- Glare -->
+  <path d="M 264 46 L 308 46 L 278 120 L 260 120 Z" fill="#ffffff" opacity="0.15"/>
+
+  <!-- Nose Pads -->
+  <ellipse cx="180" cy="74" rx="3" ry="6" fill="#cbd5e1" opacity="0.8"/>
+  <ellipse cx="220" cy="74" rx="3" ry="6" fill="#cbd5e1" opacity="0.8"/>
+</svg>

@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 160" width="100%" height="100%" fill="none">
+  <!-- Aviator Classic Gold Frame -->
+  <defs>
+    <linearGradient id="avi-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fde047"/>
+      <stop offset="35%" stop-color="#eab308"/>
+      <stop offset="70%" stop-color="#ca8a04"/>
+      <stop offset="100%" stop-color="#fef08a"/>
+    </linearGradient>
+    <linearGradient id="avi-lens" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#059669" stop-opacity="0.30"/>
+      <stop offset="40%" stop-color="#10b981" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#047857" stop-opacity="0.25"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Left Temple Extension -->
+  <path d="M 32 46 L 8 44 C 6 44 4 45 4 48 L 4 52 C 4 54 6 56 8 56 L 32 52 Z" fill="url(#avi-gold)"/>
+  <!-- Right Temple Extension -->
+  <path d="M 368 46 L 392 44 C 394 44 396 45 396 48 L 396 52 C 396 54 394 56 392 56 L 368 52 Z" fill="url(#avi-gold)"/>
+
+  <!-- Top Brow Bar (Classic Aviator feature) -->
+  <path d="M 110 32 L 290 32" stroke="url(#avi-gold)" stroke-width="4.5" stroke-linecap="round"/>
+
+  <!-- Lower Bridge -->
+  <path d="M 180 54 C 190 48 210 48 220 54" stroke="url(#avi-gold)" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Left Teardrop Lens Glass -->
+  <path d="M 40 46 C 40 34 85 34 140 34 C 172 34 182 46 182 68 C 182 108 155 138 112 138 C 65 138 40 102 40 68 Z" fill="url(#avi-lens)"/>
+  <!-- Left Teardrop Lens Glare -->
+  <path d="M 55 42 L 105 42 L 70 126 L 52 126 Z" fill="#ffffff" opacity="0.15"/>
+  <!-- Left Rim -->
+  <path d="M 40 46 C 40 34 85 34 140 34 C 172 34 182 46 182 68 C 182 108 155 138 112 138 C 65 138 40 102 40 68 Z" stroke="url(#avi-gold)" stroke-width="5" stroke-linejoin="round"/>
+
+  <!-- Right Teardrop Lens Glass -->
+  <path d="M 360 46 C 360 34 315 34 260 34 C 228 34 218 46 218 68 C 218 108 245 138 288 138 C 335 138 360 102 360 68 Z" fill="url(#avi-lens)"/>
+  <!-- Right Teardrop Lens Glare -->
+  <path d="M 275 42 L 325 42 L 290 126 L 272 126 Z" fill="#ffffff" opacity="0.15"/>
+  <!-- Right Rim -->
+  <path d="M 360 46 C 360 34 315 34 260 34 C 228 34 218 46 218 68 C 218 108 245 138 288 138 C 335 138 360 102 360 68 Z" stroke="url(#avi-gold)" stroke-width="5" stroke-linejoin="round"/>
+
+  <!-- Nose Pads with Arms -->
+  <path d="M 180 70 C 176 76 176 86 180 92" stroke="url(#avi-gold)" stroke-width="2.5" stroke-linecap="round"/>
+  <ellipse cx="178" cy="84" rx="3.5" ry="7" fill="#fef08a" opacity="0.9"/>
+  <path d="M 220 70 C 224 76 224 86 220 92" stroke="url(#avi-gold)" stroke-width="2.5" stroke-linecap="round"/>
+  <ellipse cx="222" cy="84" rx="3.5" ry="7" fill="#fef08a" opacity="0.9"/>
+</svg>
