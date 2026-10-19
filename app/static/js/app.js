@@ -301,18 +301,20 @@ class AboOptikaApp {
       if (!response.ok) {
         let errMessage = `Ошибка сервера (${response.status})`;
         try {
-          const errData = await response.json();
-          if (errData && errData.detail) {
-            errMessage = typeof errData.detail === 'string'
-              ? errData.detail
-              : JSON.stringify(errData.detail);
-          } else if (errData && errData.message) {
-            errMessage = errData.message;
+          const rawText = await response.text();
+          try {
+            const errData = JSON.parse(rawText);
+            if (errData && errData.detail) {
+              errMessage = typeof errData.detail === 'string' ? errData.detail : JSON.stringify(errData.detail);
+            } else if (errData && errData.message) {
+              errMessage = errData.message;
+            }
+          } catch (_) {
+            if (rawText && rawText.trim()) {
+              errMessage = rawText.trim().slice(0, 150);
+            }
           }
-        } catch (_) {
-          const rawText = await response.text().catch(() => '');
-          if (rawText) errMessage = rawText.slice(0, 150);
-        }
+        } catch (_) {}
         throw new Error(errMessage);
       }
 

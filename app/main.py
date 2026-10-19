@@ -140,9 +140,22 @@ async def analyze_face(request: Request):
             detail="Необходимо передать файл (multipart/form-data) или валидную base64-строку изображения (application/json)"
         )
 
-    service = FaceMeshService.get_instance()
-    result = service.analyze_image_bytes(image_bytes, frame_shape_hint=frame_shape_hint)
-    return result
+    try:
+        service = FaceMeshService.get_instance()
+        result = service.analyze_image_bytes(image_bytes, frame_shape_hint=frame_shape_hint)
+        return result
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return JSONResponse(
+            status_code=500,
+            content={
+                "success": False,
+                "face_detected": False,
+                "message": f"Ошибка анализа: {str(e)}",
+                "detail": f"Внутренняя ошибка сервиса биометрии: {str(e)}"
+            }
+        )
 
 @app.get("/api/catalog")
 async def get_catalog(shape: Optional[str] = Query(None)):
