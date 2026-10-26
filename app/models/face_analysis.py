@@ -103,6 +103,11 @@ class WornFrameEvaluation(BaseModel):
     pros_ru: List[str] = Field(default_factory=list, description="Сильные стороны посадки")
     cons_ru: List[str] = Field(default_factory=list, description="Что можно улучшить")
     fit_metrics: FitMetrics
+    bridge_nuance_ru: Optional[str] = Field(None, description="Экспертный разбор мостика и носоупоров")
+    temple_nuance_ru: Optional[str] = Field(None, description="Экспертный разбор заушников с батареями")
+    ai_recommendation_ru: Optional[str] = Field(None, description="Рекомендация ИИ-оптометриста")
+    is_ai_powered: bool = Field(default=False, description="Сгенерировано ли заключение моделью Gemini AI")
+    ai_model_name: Optional[str] = Field(default=None, description="Имя модели ИИ")
 
 class AlternativeFrame(BaseModel):
     frame_id: str
@@ -110,12 +115,24 @@ class AlternativeFrame(BaseModel):
     brand: str
     shape: str
     shape_name_ru: str
+    profile_id: Optional[str] = None
     match_score: int
     why_better_ru: str
     svg_url: str
     color: str
     material: str
     dimensions: str
+    model_line: Optional[str] = None
+    generation: Optional[str] = None
+    camera: Optional[str] = None
+    display: Optional[str] = None
+    has_display: Optional[bool] = False
+    audio: Optional[str] = None
+    price: Optional[int] = None
+    currency: Optional[str] = "₸"
+    weight_g: Optional[float] = None
+    fit_type: Optional[str] = None
+    smart_features: Optional[List[str]] = None
 
 class FrameRecommendation(BaseModel):
     frame_id: str
@@ -131,6 +148,16 @@ class FrameRecommendation(BaseModel):
     color: str
     material: str
     dimensions: str
+    model_line: Optional[str] = None
+    generation: Optional[str] = None
+    camera: Optional[str] = None
+    display: Optional[str] = None
+    has_display: Optional[bool] = False
+    audio: Optional[str] = None
+    price: Optional[int] = None
+    currency: Optional[str] = "₸"
+    weight_g: Optional[float] = None
+    fit_type: Optional[str] = None
 
 class ShapeScore(BaseModel):
     shape_id: str
@@ -150,3 +177,16 @@ class AnalyzeResponse(BaseModel):
     top_recommendations: List[FrameRecommendation] = []
     all_shapes_scores: List[ShapeScore] = []
     processing_time_ms: float = 0.0
+
+class ChatMessage(BaseModel):
+    role: str = Field(..., description="'user' или 'assistant'")
+    content: str = Field(..., description="Текст сообщения")
+
+class ChatRequest(BaseModel):
+    messages: List[ChatMessage] = Field(..., description="История диалога")
+    client_context: Optional[Dict[str, Any]] = Field(default=None, description="Биометрический контекст сканирования лица")
+
+class ChatResponse(BaseModel):
+    success: bool = True
+    reply: str
+    suggested_prompts: List[str] = Field(default_factory=list)

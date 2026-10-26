@@ -55,7 +55,7 @@
   </script>
 
   <!-- Custom Styles: White & Dark Navy Blue -->
-  <link rel="stylesheet" href="/static/css/custom.css">
+  <link rel="stylesheet" href="/static/css/custom.css?v=20261027_05">
 </head>
 <body class="bg-[#F8FAFC] text-slate-800 min-h-screen font-sans antialiased selection:bg-navy-900 selection:text-white flex flex-col">
 
@@ -175,16 +175,20 @@
       <!-- Quick Demo Presets -->
       <div class="w-full mt-5 pt-4 border-t border-navy-900/10">
         <div class="flex items-center justify-between mb-2">
-          <span class="text-[11px] font-bold text-navy-900/70 uppercase tracking-wider">Тестовые сценарии примерки:</span>
+          <span class="text-[11px] font-bold text-navy-900/70 uppercase tracking-wider">Тестовые сценарии:</span>
           <span class="text-[10px] font-bold text-navy-900 bg-navy-50 px-2 py-0.5 rounded border border-navy-900/10">1-клик тест</span>
         </div>
-        <div class="grid grid-cols-2 gap-2">
-          <button id="btn-demo-wearing-square" class="p-3 rounded-xl bg-white hover:bg-navy-50/50 border border-navy-900/15 text-left transition-all shadow-sm hover:border-navy-900/30">
-            <div class="text-xs font-bold text-navy-900">В квадратной оправе</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <button id="btn-demo-no-glasses" class="p-2.5 rounded-xl bg-white hover:bg-navy-50/50 border border-navy-900/15 text-left transition-all shadow-sm hover:border-navy-900/30">
+            <div class="text-xs font-bold text-navy-900">👤 Без очков</div>
+            <div class="text-[10px] font-semibold text-sky-700 mt-0.5">Первичный подбор оправы</div>
+          </button>
+          <button id="btn-demo-wearing-square" class="p-2.5 rounded-xl bg-white hover:bg-navy-50/50 border border-navy-900/15 text-left transition-all shadow-sm hover:border-navy-900/30">
+            <div class="text-xs font-bold text-navy-900">👓 В квадратной</div>
             <div class="text-[10px] font-semibold text-amber-700 mt-0.5">Ширина 143 мм (Широковата)</div>
           </button>
-          <button id="btn-demo-wearing-round" class="p-3 rounded-xl bg-white hover:bg-navy-50/50 border border-navy-900/15 text-left transition-all shadow-sm hover:border-navy-900/30">
-            <div class="text-xs font-bold text-navy-900">В круглой оправе</div>
+          <button id="btn-demo-wearing-round" class="p-2.5 rounded-xl bg-white hover:bg-navy-50/50 border border-navy-900/15 text-left transition-all shadow-sm hover:border-navy-900/30">
+            <div class="text-xs font-bold text-navy-900">👓 В круглой</div>
             <div class="text-[10px] font-semibold text-emerald-700 mt-0.5">Ширина 135 мм (Соответствует)</div>
           </button>
         </div>
@@ -255,19 +259,21 @@
 
       </div>
 
-      <!-- ================= 2. ОЦЕНКА ТЕКУЩЕГО ВЫБОРА (ВЕРДИКТ ОПТОМЕТРИСТА) ================= -->
+      <!-- ================= 2. ОЦЕНКА ПОСАДКИ / ЭКСПЕРТНЫЙ ПОДБОР ОПРАВЫ ================= -->
       <div id="verdict-card" class="brand-card rounded-2xl p-5 sm:p-6 border-2 border-navy-900/20 shadow-md">
         
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pb-3.5 border-b border-navy-900/10">
           <div>
-            <span class="text-[10px] uppercase tracking-wider text-navy-900/60 font-bold block">Оценка посадки надетой оправы</span>
+            <span id="verdict-section-mode-title" class="text-[10px] uppercase tracking-wider text-navy-900/60 font-bold block">
+              Оценка посадки надетой оправы
+            </span>
             <h2 id="worn-shape-name" class="text-base sm:text-lg font-extrabold text-navy-900 mt-0.5">
               Квадратная оправа
             </h2>
           </div>
 
           <div class="flex items-center gap-2 bg-navy-50 px-3 py-1.5 rounded-xl border border-navy-900/15">
-            <span class="text-xs text-navy-900/70 font-semibold">Совместимость:</span>
+            <span id="worn-score-label" class="text-xs text-navy-900/70 font-semibold">Совместимость:</span>
             <span id="worn-compatibility-score" class="text-xl font-extrabold text-navy-900">80%</span>
             <span id="worn-match-badge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-white text-navy-900 border border-navy-900/15 shadow-sm">
               Есть нюансы
@@ -275,19 +281,48 @@
           </div>
         </div>
 
-        <!-- Заключение стилиста / оптометриста -->
-        <div class="my-4 p-4 rounded-xl bg-navy-50 border-l-4 border-navy-900 text-xs">
-          <span class="text-[10px] text-navy-900 uppercase tracking-wider font-extrabold block mb-1">Заключение оптометриста:</span>
-          <p id="stylist-quote" class="text-navy-950 font-medium leading-relaxed">
+        <!-- Заключение эксперта-оптометриста AbooOptika -->
+        <div class="my-4 p-4 rounded-xl bg-gradient-to-br from-navy-50 via-white to-navy-50/50 border-2 border-navy-900/20 text-xs shadow-sm relative overflow-hidden">
+          <div class="flex items-center justify-between gap-2 mb-2 flex-wrap">
+            <span class="inline-flex items-center gap-2 px-2.5 py-1 rounded-md text-[10px] font-extrabold bg-navy-900 text-white uppercase tracking-wider">
+              <img src="/static/images/brand/ai-avatar.png" alt="ИИ-Оптометрист" class="w-4 h-4 rounded-full object-cover border border-white/30 shrink-0">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              Заключение эксперта-оптометриста AbooOptika
+            </span>
+            <span id="ai-model-pill" class="text-[10px] font-bold text-navy-900/70 bg-navy-100/60 px-2 py-0.5 rounded border border-navy-900/10">
+              AbooOptika AI Biometrics
+            </span>
+          </div>
+          <p id="stylist-quote" class="text-navy-950 text-sm font-semibold leading-relaxed">
             Оправа «Квадратная»: совместимость 80%. По высоте сидит правильно, но ширина (143 мм) шире скул на 8 мм.
           </p>
+
+          <!-- Специализированные блоки анализа: Мостик и Заушники -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 pt-3 border-t border-navy-900/10">
+            <div class="bg-white/80 p-2.5 rounded-lg border border-navy-900/10">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-navy-900/70 block mb-0.5">
+                Мостик & Переносица:
+              </span>
+              <p id="bridge-nuance-text" class="text-[11px] text-slate-700 font-medium leading-snug">
+                Стандартный мостик 20-22 мм обеспечивает стабильное распределение веса смарт-очков.
+              </p>
+            </div>
+            <div class="bg-white/80 p-2.5 rounded-lg border border-navy-900/10">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-navy-900/70 block mb-0.5">
+                Заушники & Батареи:
+              </span>
+              <p id="temple-nuance-text" class="text-[11px] text-slate-700 font-medium leading-snug">
+                Электронные заушники требуют плотного охвата без сдавливания височных артерий.
+              </p>
+            </div>
+          </div>
         </div>
 
         <!-- 3 точных показателя посадки -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
           <div class="bg-white p-3.5 rounded-xl border border-navy-900/10 shadow-sm">
             <div class="flex items-center justify-between text-xs mb-1">
-              <span class="text-slate-500 font-medium">Ширина оправы</span>
+              <span id="fit-metric-1-title" class="text-slate-500 font-medium">Ширина оправы</span>
               <span id="fit-width-status" class="font-bold text-amber-700">Широковата</span>
             </div>
             <p id="fit-width-desc" class="text-[11px] text-slate-700">Превышает скулы на +8 мм</p>
@@ -295,7 +330,7 @@
 
           <div class="bg-white p-3.5 rounded-xl border border-navy-900/10 shadow-sm">
             <div class="flex items-center justify-between text-xs mb-1">
-              <span class="text-slate-500 font-medium">Положение зрачков</span>
+              <span id="fit-metric-2-title" class="text-slate-500 font-medium">Положение зрачков</span>
               <span id="fit-pupil-status" class="font-bold text-emerald-700">Идеально</span>
             </div>
             <p id="fit-pupil-desc" class="text-[11px] text-slate-700">На оптической оси светового проема</p>
@@ -303,7 +338,7 @@
 
           <div class="bg-white p-3.5 rounded-xl border border-navy-900/10 shadow-sm">
             <div class="flex items-center justify-between text-xs mb-1">
-              <span class="text-slate-500 font-medium">Линия бровей</span>
+              <span id="fit-metric-3-title" class="text-slate-500 font-medium">Линия бровей</span>
               <span id="fit-eyebrow-status" class="font-bold text-emerald-700">Гармонично</span>
             </div>
             <p id="fit-eyebrow-desc" class="text-[11px] text-slate-700">По нижней границе надбровной дуги</p>
@@ -313,13 +348,13 @@
         <!-- Анатомические соответствия и риски -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3.5 pt-3.5 border-t border-navy-900/10 text-xs">
           <div>
-            <strong class="text-navy-900 text-[11px] uppercase tracking-wider block mb-1">Соответствия:</strong>
+            <strong id="pros-title" class="text-navy-900 text-[11px] uppercase tracking-wider block mb-1">Соответствия:</strong>
             <ul id="pros-list" class="text-slate-700 space-y-1 list-disc list-inside">
               <li>Ширина рамки выровнена по височной линии скул</li>
             </ul>
           </div>
           <div>
-            <strong class="text-navy-900 text-[11px] uppercase tracking-wider block mb-1">Отклонения и риски:</strong>
+            <strong id="cons-title" class="text-navy-900 text-[11px] uppercase tracking-wider block mb-1">Отклонения и риски:</strong>
             <ul id="cons-list" class="text-slate-700 space-y-1 list-disc list-inside">
               <li>Оправа выступает за височную линию, заушники будут оттопыриваться</li>
             </ul>
@@ -328,19 +363,25 @@
 
       </div>
 
-      <!-- ================= 3. ТОП-3 АЛЬТЕРНАТИВЫ ИЗ КАТАЛОГА ОПТИКИ ================= -->
+      <!-- ================= 3. ТОП-5 АЛЬТЕРНАТИВ ИЗ КАТАЛОГА СМАРТ-ОЧКОВ META ================= -->
       <div class="w-full flex flex-col gap-3">
-        <div>
-          <h3 class="text-lg font-display font-extrabold text-navy-900">
-            Рекомендованные модели для примерки в салоне
-          </h3>
-          <p class="text-xs text-slate-500">
-            Оправы из ассортимента салона с выверенной геометрической компенсацией для вашего типа лица
-          </p>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h3 id="recommendations-heading" class="text-lg font-display font-extrabold text-navy-900">
+              ТОП-5 моделей смарт-очков Meta для примерки
+            </h3>
+            <p id="recommendations-subheading" class="text-xs text-slate-500">
+              Официальная линейка Ray-Ban Meta и Meta с идеальной геометрической и антропометрической посадкой
+            </p>
+          </div>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-navy-50 text-navy-900 border border-navy-900/15 self-start sm:self-auto">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            Официальный каталог Meta 2025
+          </span>
         </div>
 
-        <!-- Top-3 Alternatives Cards Grid (Only Text & Pure Data!) -->
-        <div id="alternatives-container" class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+        <!-- Top-5 Alternatives Cards Grid -->
+        <div id="alternatives-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <!-- Dynamically populated by app.js -->
         </div>
       </div>
@@ -385,6 +426,113 @@
       </div>
     </div>
   </footer>
+
+  <!-- ================= FLOATING AI CHAT WIDGET (AbooOptika Meta Expert) ================= -->
+  <div id="chat-widget-container" class="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-[9999] flex flex-col items-end pointer-events-auto">
+    
+    <!-- 2. Interactive Chat Panel (Apple HIG Glassmorphism with dense solid dark navy background) -->
+    <div id="chat-panel" class="hidden mb-3 w-[calc(100vw-2rem)] sm:w-[420px] h-[580px] max-h-[82vh] rounded-3xl flex flex-col overflow-hidden text-white shadow-[0_25px_65px_rgba(0,0,0,0.85)] border-2 border-white/20 transition-all z-[9999]"
+         style="background-color: #071840 !important; background: linear-gradient(165deg, #0C2356 0%, #071840 50%, #051230 100%) !important; color: #FFFFFF !important;">
+      
+      <!-- Panel Header -->
+      <div class="p-4 border-b border-white/15 flex items-center justify-between text-white"
+           style="background-color: #0B2564 !important; border-bottom: 1px solid rgba(255,255,255,0.18) !important;">
+        <div class="flex items-center gap-3">
+          <!-- Official Streetwear Avatar -->
+          <div class="relative w-10 h-10 rounded-full overflow-hidden border-2 border-white/40 shadow-md shrink-0 bg-[#071840] flex items-center justify-center">
+            <img src="/static/images/brand/ai-avatar.png" alt="AbooOptika AI" class="w-full h-full object-cover">
+            <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-[#0B2564]"></span>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="text-xs font-black uppercase tracking-wider text-white">AbooOptika AI</h3>
+              <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                Online
+              </span>
+            </div>
+            <p class="text-[10px] text-slate-200 font-medium">Консультант по смарт-очкам Meta</p>
+          </div>
+        </div>
+
+        <!-- Header Actions: Clear & Close -->
+        <div class="flex items-center gap-1">
+          <button id="btn-chat-clear" type="button" title="Очистить диалог"
+                  class="p-2 rounded-xl text-slate-200 hover:text-white hover:bg-white/15 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          </button>
+          <button id="btn-chat-close" type="button" title="Свернуть чат"
+                  class="p-2 rounded-xl text-slate-200 hover:text-white hover:bg-white/15 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Personal Biometric Context Pill (active when scan completed) -->
+      <div id="chat-biometric-banner" class="hidden px-4 py-2 bg-[#0E2F7D] border-b border-white/15 flex items-center justify-between text-xs text-white font-semibold"
+           style="background-color: #0E2F7D !important; border-bottom: 1px solid rgba(255,255,255,0.15) !important;">
+        <span class="flex items-center gap-1.5">
+          <span class="text-emerald-300">👤</span>
+          <span id="chat-bio-context-text" class="text-white">Биометрия лица учтена</span>
+        </span>
+        <span class="px-2 py-0.5 rounded-md bg-white/15 text-[10px] font-bold text-white border border-white/20">Персонализация</span>
+      </div>
+
+      <!-- Messages Body -->
+      <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3.5 text-xs sm:text-[13px] text-white"
+           style="background-color: #071840 !important; color: #FFFFFF !important;">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+
+      <!-- Quick Chips Bar -->
+      <div id="chat-chips-bar" class="px-3.5 py-2.5 border-t border-white/15 flex items-center gap-2 overflow-x-auto no-scrollbar"
+           style="background-color: #0B2564 !important; border-top: 1px solid rgba(255,255,255,0.15) !important;">
+        <!-- Dynamically rendered chip prompts -->
+      </div>
+
+      <!-- Chat Input Form -->
+      <form id="chat-form" class="p-3.5 border-t border-white/15 flex items-center gap-2.5"
+            style="background-color: #071840 !important; border-top: 1px solid rgba(255,255,255,0.15) !important;">
+        <input id="chat-input" type="text" autocomplete="off"
+               placeholder="Спросите о моделях Meta, подборе или ценах..."
+               class="flex-1 rounded-2xl px-4 py-2.5 text-xs sm:text-[13px] text-white placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-white transition-all font-medium"
+               style="background-color: #0F2D6B !important; color: #FFFFFF !important; border: 1.5px solid rgba(255,255,255,0.25) !important;">
+        <button id="btn-chat-send" type="submit" disabled
+                class="w-10 h-10 rounded-xl bg-white text-[#071840] hover:bg-slate-100 flex items-center justify-center font-black transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0 shadow-lg cursor-pointer"
+                style="background-color: #FFFFFF !important; color: #071840 !important;">
+          <svg class="w-4 h-4 rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19V5m0 0l-7 7m7-7l7 7"/></svg>
+        </button>
+      </form>
+
+    </div>
+
+    <!-- 1. Floating Trigger Button with Official Avatar -->
+    <button id="btn-toggle-chat" type="button" aria-label="Открыть ИИ-чат AbooOptika"
+            class="group flex items-center gap-3 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-full text-white font-bold cursor-pointer select-none shadow-[0_12px_32px_rgba(7,24,64,0.7)] border-2 border-white/40 transition-all duration-200 z-[9999]"
+            style="background: #0C2662 !important; background: linear-gradient(135deg, #0C2662 0%, #19345E 50%, #071840 100%) !important; color: #FFFFFF !important;">
+      
+      <!-- Avatar with glowing ring & pulsing online indicator -->
+      <div class="relative flex items-center justify-center w-10 h-10 rounded-full bg-[#071840] border-2 border-white/50 shadow-inner group-hover:scale-105 transition-transform shrink-0">
+        <img src="/static/images/brand/ai-avatar.png" alt="AbooOptika AI Avatar" class="w-full h-full rounded-full object-cover shadow-sm">
+        <!-- Pulsing Green Dot -->
+        <span class="absolute -top-0.5 -right-0.5 flex h-3 w-3">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-400 border border-navy-950"></span>
+        </span>
+      </div>
+
+      <div class="text-left hidden sm:block pr-1">
+        <div class="text-xs font-black tracking-wide text-white leading-tight">ИИ-Консультант</div>
+        <div class="text-[10px] text-slate-200 font-semibold">Meta Smart Glasses</div>
+      </div>
+
+      <!-- Arrow / Chevron -->
+      <span id="chat-trigger-icon" class="ml-0.5 text-white/90 group-hover:text-white transition-transform">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+      </span>
+    </button>
+
+  </div>
 
   <!-- Scripts -->
   <script src="/static/js/camera.js"></script>

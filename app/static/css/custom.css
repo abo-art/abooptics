@@ -179,3 +179,95 @@ body {
     box-shadow: none !important;
   }
 }
+
+/* ==========================================================================
+   Apple HIG Glassmorphism & AI Chat Widget Styles (Высокий контраст и плотный темный фон)
+   ========================================================================== */
+.chat-glass {
+  background-color: #071840 !important;
+  background: linear-gradient(165deg, #0C2356 0%, #071840 50%, #051230 100%) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.22) !important;
+  box-shadow: 0 25px 65px -10px rgba(2, 8, 28, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.12) inset !important;
+  color: #FFFFFF !important;
+}
+
+.chat-bubble-ai {
+  background-color: #0E275E !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.18) !important;
+  box-shadow: 0 4px 16px rgba(4, 14, 38, 0.5) !important;
+  color: #F8FAFC !important;
+}
+
+.chat-bubble-user {
+  background: linear-gradient(135deg, #1E3A8A 0%, #0C2662 100%) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 4px 14px rgba(12, 38, 98, 0.5) !important;
+  color: #FFFFFF !important;
+}
+
+.chat-chip {
+  background-color: #153B85 !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  color: #FFFFFF !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.chat-chip:hover {
+  background-color: #1E40AF !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  transform: translateY(-1px) !important;
+}
+
+.chat-trigger-btn {
+  background-color: #0C2662 !important;
+  background: linear-gradient(135deg, #0C2662 0%, #19345E 50%, #071840 100%) !important;
+  border: 2px solid rgba(255, 255, 255, 0.35) !important;
+  box-shadow: 0 10px 25px -3px rgba(7, 24, 64, 0.7), 0 0 20px rgba(67, 118, 185, 0.4) !important;
+  color: #FFFFFF !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.chat-trigger-btn:hover {
+  transform: translateY(-2px) scale(1.03) !important;
+  box-shadow: 0 16px 35px -4px rgba(7, 24, 64, 0.8), 0 0 28px rgba(67, 118, 185, 0.6) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+@keyframes chat-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.chat-panel-animate-in {
+  animation: chat-enter 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Chat scrollbar */
+#chat-messages::-webkit-scrollbar {
+  width: 4px;
+}
+#chat-messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+#chat-messages::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+}
+#chat-messages::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+/* AI Streetwear Avatar styling */
+.ai-streetwear-avatar {
+  border-radius: 9999px;
+  object-fit: cover;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  aspect-ratio: 1 / 1;
+}

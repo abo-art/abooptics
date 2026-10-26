@@ -17,14 +17,14 @@ FACE_SHAPE_CATALOG: Dict[str, dict] = {
         "description_ru": "Длина лица превышает ширину скул примерно на треть (соотношение ~1.3-1.35). Линия челюсти плавно сужается к подбородку без резких углов.",
         "styling_advice_ru": "Ширина оправы должна строго соответствовать максимальной ширине лица по скулам, не выступая за височные линии.",
         "base_scores": {
+            "wayfarer": 96,
             "rectangular": 95,
-            "aviator": 94,
-            "geometric": 92,
-            "cat_eye": 91,
-            "panto": 90,
-            "clubmaster": 89,
-            "wayfarer": 88,
-            "round": 83,
+            "panto": 94,
+            "cat_eye": 93,
+            "aviator": 92,
+            "geometric": 91,
+            "round": 89,
+            "clubmaster": 88,
             "square": 80
         }
     },
@@ -35,13 +35,13 @@ FACE_SHAPE_CATALOG: Dict[str, dict] = {
         "styling_advice_ru": "Требуются оправы с четкими горизонтальными и угловыми гранями для создания оптической структуры.",
         "base_scores": {
             "rectangular": 96,
-            "wayfarer": 94,
-            "geometric": 92,
-            "cat_eye": 89,
-            "clubmaster": 84,
+            "wayfarer": 95,
+            "geometric": 93,
+            "cat_eye": 91,
+            "clubmaster": 88,
+            "panto": 86,
             "square": 80,
             "aviator": 72,
-            "panto": 56,
             "round": 40
         }
     },
@@ -52,14 +52,14 @@ FACE_SHAPE_CATALOG: Dict[str, dict] = {
         "styling_advice_ru": "Требуются оправы со скругленной нижней частью для снижения визуальной нагрузки на широкую челюсть.",
         "base_scores": {
             "round": 96,
-            "panto": 94,
-            "aviator": 93,
+            "panto": 95,
+            "cat_eye": 91,
+            "aviator": 90,
+            "wayfarer": 89,
             "clubmaster": 88,
-            "cat_eye": 84,
-            "square": 72,
-            "geometric": 74,
-            "wayfarer": 70,
-            "rectangular": 65
+            "geometric": 75,
+            "square": 65,
+            "rectangular": 58
         }
     },
     "heart": {
@@ -68,14 +68,14 @@ FACE_SHAPE_CATALOG: Dict[str, dict] = {
         "description_ru": "Лоб и виски заметно шире челюсти (разница более 12-15%). Лицо сужается к острому или зауженному подбородку.",
         "styling_advice_ru": "Требуются оправы с расширением в нижней части или тонкие безободковые модели, чтобы не утяжелять височную зону.",
         "base_scores": {
-            "aviator": 96,
-            "round": 93,
-            "panto": 92,
+            "panto": 96,
+            "round": 95,
+            "aviator": 93,
+            "wayfarer": 91,
+            "cat_eye": 89,
             "clubmaster": 87,
-            "rectangular": 82,
-            "cat_eye": 80,
-            "wayfarer": 75,
-            "geometric": 70,
+            "rectangular": 85,
+            "geometric": 75,
             "square": 55
         }
     },
@@ -85,15 +85,15 @@ FACE_SHAPE_CATALOG: Dict[str, dict] = {
         "description_ru": "Длина лица значительно превышает ширину скул (соотношение более 1.38). Боковые линии прямые, высокий лоб.",
         "styling_advice_ru": "Требуются оправы с увеличенной высотой линзы (от 40 мм), чтобы визуально разделить вертикаль лица.",
         "base_scores": {
+            "wayfarer": 96,
             "square": 95,
-            "wayfarer": 94,
-            "aviator": 92,
-            "geometric": 90,
-            "panto": 88,
-            "round": 85,
-            "clubmaster": 83,
-            "cat_eye": 78,
-            "rectangular": 50
+            "panto": 94,
+            "geometric": 92,
+            "aviator": 91,
+            "round": 89,
+            "cat_eye": 88,
+            "clubmaster": 85,
+            "rectangular": 60
         }
     },
     "diamond": {
@@ -102,14 +102,14 @@ FACE_SHAPE_CATALOG: Dict[str, dict] = {
         "description_ru": "Скулы являются самой широкой частью лица. Линия лба и линия челюсти заужены.",
         "styling_advice_ru": "Требуются оправы с акцентом на верхней линии (Cat-Eye, Clubmaster) шириной строго в границах скул.",
         "base_scores": {
-            "cat_eye": 97,
-            "clubmaster": 94,
-            "round": 91,
-            "panto": 90,
-            "aviator": 88,
-            "rectangular": 82,
-            "wayfarer": 79,
-            "geometric": 68,
+            "cat_eye": 98,
+            "panto": 95,
+            "round": 93,
+            "wayfarer": 90,
+            "clubmaster": 89,
+            "rectangular": 87,
+            "aviator": 85,
+            "geometric": 70,
             "square": 58
         }
     }
@@ -211,20 +211,151 @@ class StylingEngine:
         catalog_frames: List[dict]
     ) -> Tuple[WornFrameEvaluation, List[AlternativeFrame]]:
         """
-        Реальный оптометрический расчет посадки надетой оправы на основе замеров:
-        - Ширина оправы относительно скул (в мм)
-        - Центровка зрачка в световом проеме
-        - Геометрическая совместимость формы оправы с челюстью и лбом
+        Реальный оптометрический расчет посадки надетой оправы на основе биометрии лица
+        и эргономики смарт-очков Meta:
+        - Ширина рамки относительно скул (в мм) и плотность прилегания заушников с электроникой
+        - Центровка зрачка на оптической оси и угол обзора 12MP POV-камеры
+        - Геометрическая компенсация формы оправы для контура лица
+        - Подбор ТОП-5 альтернативных моделей смарт-очков Meta
         """
+        from app.services.ai_optometrist import AIOptometristService
+        from app.services.catalog_service import CatalogService
+
         detected_shape = glasses_info.get("shape", "square")
         width_ratio = glasses_info.get("width_ratio", 1.06)
         has_glasses = glasses_info.get("has_glasses", True)
         
         cfg = FACE_SHAPE_CATALOG.get(face_shape.shape_id, FACE_SHAPE_CATALOG["oval"])
+
+        if not has_glasses:
+            # Режим первичного подбора оправы под форму лица (клиент без очков)
+            ai_consultation = AIOptometristService.generate_expert_consultation(
+                face_shape_id=face_shape.shape_id,
+                face_shape_ru=face_shape.shape_name_ru,
+                metrics_dict=face_metrics.model_dump(),
+                worn_fit_dict={"has_glasses": False, "detected_shape_name_ru": "Оправа не надета"},
+                top_meta_profiles=CatalogService.get_all_profiles()
+            )
+
+            verdict_text = ai_consultation.get("verdict_quote") or (
+                f"Оправа на лице отсутствует. На основе биометрии лица ({face_shape.shape_name_ru}) "
+                f"рассчитаны идеальные пропорции и подобраны лучшие модели смарт-очков Meta."
+            )
+            bridge_nuance = ai_consultation.get("bridge_nuance") or (
+                f"Для формы лица «{face_shape.shape_name_ru}» оптимален мостик 20–22 мм (Keyhole или Saddle) для равномерного распределения веса."
+            )
+            temple_nuance = ai_consultation.get("temple_nuance") or (
+                "Рекомендуются дужки 145–150 мм с мягким височным прилеганием без сдавливания."
+            )
+            ai_rec = ai_consultation.get("expert_recommendation") or face_shape.styling_advice_ru
+
+            pros = [
+                f"Анатомический контур лица: {face_shape.shape_name_ru} (точность {face_shape.confidence}%)",
+                "Рассчитана оптимальная ширина рамки и геометрия светового проёма"
+            ]
+            if ai_consultation.get("pros"):
+                pros = ai_consultation["pros"]
+
+            cons = ai_consultation.get("cons") or []
+
+            worn_evaluation = WornFrameEvaluation(
+                has_glasses=False,
+                detected_shape="none",
+                detected_shape_name_ru="Оправа не надета",
+                compatibility_score=98,
+                match_badge="Первичный биометрический подбор",
+                verdict_quote_ru=verdict_text,
+                pros_ru=pros,
+                cons_ru=cons,
+                fit_metrics=FitMetrics(
+                    width_status="Подбор размера",
+                    width_ratio=1.0,
+                    width_feedback_ru="Рекомендуемая ширина рамки: 133–139 мм (Standard или Large Fit L).",
+                    pupil_status="Оптическая ось",
+                    pupil_feedback_ru="Зрачки послужат оптическим центром для идеальной центровки линз.",
+                    eyebrow_status="Линия бровей",
+                    eyebrow_feedback_ru="Рекомендуется оправа с верхней планкой, повторяющей надбровную дугу."
+                ),
+                bridge_nuance_ru=bridge_nuance,
+                temple_nuance_ru=temple_nuance,
+                ai_recommendation_ru=ai_rec,
+                is_ai_powered=ai_consultation.get("is_ai_generated", False),
+                ai_model_name="AbooOptika AI Optometrist"
+            )
+
+            # Для рекомендаций выбираем топ-5 лучших моделей Meta под форму лица
+            from app.services.catalog_service import OPTOMETRIC_REASONS
+            face_reasons = OPTOMETRIC_REASONS.get(face_shape.shape_id, {})
+
+            scored_candidates: List[Tuple[int, dict]] = []
+            for f in catalog_frames:
+                sh = f.get("shape", "wayfarer")
+                sc = cfg["base_scores"].get(sh, 85)
+                if f.get("generation") and "Gen 3" in f.get("generation"):
+                    sc += 2
+                elif f.get("camera"):
+                    sc += 1
+                scored_candidates.append((sc, f))
+
+            scored_candidates.sort(key=lambda x: x[0], reverse=True)
+
+            selected_candidates: List[Tuple[int, dict]] = []
+            used_shapes = set()
+            for sc, f in scored_candidates:
+                sh = f.get("shape", "wayfarer")
+                if sh not in used_shapes and len(selected_candidates) < 5:
+                    selected_candidates.append((sc, f))
+                    used_shapes.add(sh)
+
+            for sc, f in scored_candidates:
+                if len(selected_candidates) >= 5:
+                    break
+                if f not in [x[1] for x in selected_candidates]:
+                    selected_candidates.append((sc, f))
+
+            top_alternatives: List[AlternativeFrame] = []
+            for sc, f in selected_candidates[:5]:
+                sh = f.get("shape", "wayfarer")
+                why_better = face_reasons.get(
+                    sh,
+                    f"Форма «{SHAPE_NAMES_RU.get(sh, sh)}» гармонично балансирует анатомию {face_shape.shape_name_ru} лица."
+                )
+                if f.get("optometric_notes"):
+                    why_better = f"{why_better} {f.get('optometric_notes')}"
+
+                alt = AlternativeFrame(
+                    frame_id=f["frame_id"],
+                    name=f["name"],
+                    brand=f["brand"],
+                    shape=sh,
+                    shape_name_ru=f.get("shape_name_ru", SHAPE_NAMES_RU.get(sh, sh.title())),
+                    profile_id=f.get("profile_id"),
+                    match_score=min(98, sc),
+                    why_better_ru=why_better,
+                    svg_url="",
+                    color=f.get("color", ""),
+                    material=f.get("material", ""),
+                    dimensions=f.get("dimensions", ""),
+                    model_line=f.get("model_line"),
+                    generation=f.get("generation"),
+                    camera=f.get("camera"),
+                    display=f.get("display"),
+                    has_display=f.get("has_display", False),
+                    audio=f.get("audio"),
+                    price=f.get("price"),
+                    currency=f.get("currency", "₸"),
+                    weight_g=f.get("weight_g"),
+                    fit_type=f.get("fit_type"),
+                    smart_features=f.get("style_tags", [])
+                )
+                top_alternatives.append(alt)
+
+            return worn_evaluation, top_alternatives
+
         base_shape_score = cfg["base_scores"].get(detected_shape, 75)
         shape_name = SHAPE_NAMES_RU.get(detected_shape, "Квадратная")
 
-        # Расчет отклонения ширины в миллиметрах при среднем базисе лица 135 мм
+        # Расчет ширины оправы в мм при среднем антропометрическом базисе лица 135 мм
         estimated_face_width_mm = 135.0
         frame_width_mm = round(estimated_face_width_mm * width_ratio, 1)
         diff_mm = round(abs(frame_width_mm - estimated_face_width_mm), 1)
@@ -233,33 +364,33 @@ class StylingEngine:
         cons: List[str] = []
         width_penalty = 0
 
-        # Оценка посадки по ширине
+        # 1. Оценка посадки по ширине с учётом электронных заушников
         if width_ratio > 1.04:
             width_status = "Широковата"
             width_feedback = f"Ширина {int(frame_width_mm)} мм превышает скулы на +{int(diff_mm)} мм. Заушники будут оттопыриваться."
-            cons.append(f"Оправа выступает за височную линию на {int(diff_mm)} мм, визуально сдвигая зрачки к переносице.")
+            cons.append(f"Оправа выступает за височную линию на {int(diff_mm)} мм: в смарт-очках дужки со встроенными батареями будут оттопыриваться, снижая плотность прилегания open-ear динамиков.")
             width_penalty = int((width_ratio - 1.04) * 70)
         elif width_ratio < 0.96:
             width_status = "Узковата"
             width_feedback = f"Ширина {int(frame_width_mm)} мм меньше скул на -{int(diff_mm)} мм. Заушники будут давить на виски."
-            cons.append(f"Оправа уже лица на {int(diff_mm)} мм, создаст избыточное давление на височные кости.")
+            cons.append(f"Оправа уже лица на {int(diff_mm)} мм: электронные заушники смарт-очков создадут избыточное давление на височные артерии.")
             width_penalty = int((0.96 - width_ratio) * 80)
         else:
             width_status = "Идеально"
             width_feedback = f"Ширина {int(frame_width_mm)} мм строго совпадает с шириной скул (отклонение < 2 мм)."
-            pros.append(f"Ширина рамки ({int(frame_width_mm)} мм) точно выровнена по височной линии скул.")
+            pros.append(f"Ширина рамки ({int(frame_width_mm)} мм) выровнена по скулам: открытые микродинамики направлены точно в ушной канал без потери баса.")
 
-        # Оценка центровки зрачков
+        # 2. Оценка центровки зрачков и угла обзора камеры
         pupil_status = "Идеально"
         pupil_feedback = "Зрачок расположен на оптической оси светового проема (на 3 мм выше геометрического центра)."
-        pros.append("Вертикальное положение зрачка соответствует фокусному центру линзы.")
+        pros.append("Зрачки находятся на оптической оси: угол обзора 12MP POV-камеры совпадает с линией естественного взгляда.")
 
-        # Оценка линии бровей
+        # 3. Оценка линии бровей и сенсоров
         eyebrow_status = "Гармонично"
         eyebrow_feedback = "Верхняя рамка оправы проходит строго по нижней границе надбровной дуги."
-        pros.append("Верхний край рамки не перекрывает бровь и повторяет ее анатомический изгиб.")
+        pros.append("Верхний край оправы не перекрывает бровь, фронтальные микрофоны свободны от помех мимики.")
 
-        # Геометрическое обоснование для конкретного типа лица
+        # 4. Анатомические соответствия формы
         if face_shape.shape_id == "square":
             if detected_shape in ["square", "rectangular"]:
                 cons.append(f"Угол челюсти составляет {int(face_metrics.chin_sharpness_deg)}° при ширине челюсти {int(face_metrics.jaw_to_cheek_ratio*100)}% от скул. Прямые углы оправы дублируют массивность челюсти.")
@@ -270,11 +401,21 @@ class StylingEngine:
                 cons.append(f"Соотношение длины к ширине {face_metrics.height_to_width_ratio:.2f}. Круглая форма линз повторяет контур щек, лишая лицо четких линий.")
             else:
                 pros.append("Прямая горизонтальная линия оправы визуально сужает и структурирует округлость щек.")
+        elif face_shape.shape_id == "heart":
+            if detected_shape in ["square", "geometric"]:
+                cons.append("Массивная верхняя часть оправы утяжеляет лоб сердцевидного лица, усиливая контраст с узким подбородком.")
+            else:
+                pros.append("Мягкая база оправы гармонично уравновешивает зауженный подбородок.")
+        elif face_shape.shape_id == "diamond":
+            if detected_shape in ["cat_eye", "panto"]:
+                pros.append("Форма оправы гармонирует с высокими скулами, смягчая переход к височной зоне.")
+            else:
+                cons.append("Геометрия оправы может конфликтовать с выступающими скуловыми костями.")
 
         # Итоговый процент совместимости
         final_score = max(40, min(97, base_shape_score - width_penalty))
 
-        # Формирование строгого обоснования стилиста (без воды)
+        # Формирование строгого обоснования стилиста-оптометриста
         if final_score >= 90:
             badge = "Идеальное попадание"
             verdict_quote = f"Оправа «{shape_name}»: совместимость {final_score}%. Ширина соответствует скулам, форма компенсирует анатомические углы лица."
@@ -300,6 +441,52 @@ class StylingEngine:
             eyebrow_feedback_ru=eyebrow_feedback
         )
 
+        # 5. Интеграция ИИ-оптометриста AbooOptika Biometrics
+
+        metrics_dict = {
+            "height_to_width_ratio": round(face_metrics.height_to_width_ratio, 2),
+            "jaw_to_cheek_ratio": round(face_metrics.jaw_to_cheek_ratio, 2),
+            "forehead_to_cheek_ratio": round(face_metrics.forehead_to_cheek_ratio, 2),
+            "chin_sharpness_deg": round(face_metrics.chin_sharpness_deg, 1),
+            "symmetry_score": round(face_metrics.symmetry_score, 1)
+        }
+
+        worn_fit_dict = {
+            "detected_shape": detected_shape,
+            "detected_shape_name_ru": f"{shape_name} оправа",
+            "width_ratio": round(width_ratio, 2),
+            "width_status": width_status,
+            "pupil_status": pupil_status,
+            "eyebrow_status": eyebrow_status
+        }
+
+        profiles = CatalogService.get_all_profiles()
+        ai_consultation = AIOptometristService.generate_expert_consultation(
+            face_shape_id=face_shape.shape_id,
+            face_shape_ru=face_shape.shape_name_ru,
+            metrics_dict=metrics_dict,
+            worn_fit_dict=worn_fit_dict,
+            top_meta_profiles=profiles
+        )
+
+        ai_score = ai_consultation.get("compatibility_score")
+        if isinstance(ai_score, int) and 40 <= ai_score <= 98:
+            final_score = ai_score
+
+        ai_verdict = ai_consultation.get("verdict_quote")
+        if ai_verdict and len(ai_verdict) > 10:
+            verdict_quote = ai_verdict
+
+        ai_pros = ai_consultation.get("pros")
+        if ai_pros and isinstance(ai_pros, list) and len(ai_pros) >= 1:
+            pros = ai_pros
+
+        ai_cons = ai_consultation.get("cons")
+        if ai_cons and isinstance(ai_cons, list) and len(ai_cons) >= 1:
+            cons = ai_cons
+
+        badge, _ = StylingEngine.get_badge_and_verdict(final_score)
+
         worn_evaluation = WornFrameEvaluation(
             has_glasses=has_glasses,
             detected_shape=detected_shape,
@@ -309,50 +496,99 @@ class StylingEngine:
             verdict_quote_ru=verdict_quote,
             pros_ru=pros,
             cons_ru=cons,
-            fit_metrics=fit_metrics
+            fit_metrics=fit_metrics,
+            bridge_nuance_ru=ai_consultation.get("bridge_nuance"),
+            temple_nuance_ru=ai_consultation.get("temple_nuance"),
+            ai_recommendation_ru=ai_consultation.get("expert_recommendation"),
+            is_ai_powered=ai_consultation.get("is_ai_generated", False),
+            ai_model_name=ai_consultation.get("ai_model", "AbooOptika AI Optometrist")
         )
 
-        # Подбор Топ-3 альтернатив со строгим геометрическим обоснованием
-        # Исключаем оправы той же формы, что и надетая
-        candidate_frames = [f for f in catalog_frames if f["shape"] != detected_shape]
-        candidate_frames.sort(key=lambda f: cfg["base_scores"].get(f["shape"], 70), reverse=True)
-
-        # Дедупликация по форме: берём лучшую модель каждой формы,
-        # чтобы в Топ-3 были разные геометрии
-        seen_shapes = set()
-        unique_candidates = []
-        for f in candidate_frames:
-            if f["shape"] not in seen_shapes:
-                seen_shapes.add(f["shape"])
-                unique_candidates.append(f)
-
-        # Импортируем оптометрические обоснования из каталога
+        # ──────────────────────────────────────────────────────────────
+        # Подбор ТОП-5 альтернатив из каталога смарт-очков Meta
+        # ──────────────────────────────────────────────────────────────
         from app.services.catalog_service import OPTOMETRIC_REASONS
         face_reasons = OPTOMETRIC_REASONS.get(face_shape.shape_id, {})
 
-        top_alternatives: List[AlternativeFrame] = []
-        for f in unique_candidates[:3]:
-            sh = f["shape"]
-            sc = cfg["base_scores"].get(sh, 85)
+        # Исключаем оправы той же формы, что и надетая
+        candidate_frames = [f for f in catalog_frames if f.get("shape") != detected_shape]
 
-            # Берём обоснование из оптометрической таблицы
+        scored_candidates: List[Tuple[int, dict]] = []
+        for f in candidate_frames:
+            sh = f.get("shape", "wayfarer")
+            base_sc = cfg["base_scores"].get(sh, 80)
+            
+            # Бонус за поколение (Gen 2 и Gen 3 имеют улучшенную развесовку и 12MP POV сенсор)
+            gen_bonus = 3 if "Gen 2" in f.get("generation", "") else (4 if "Gen 3" in f.get("generation", "") else 0)
+            
+            # Бонус за соответствие ширине лица:
+            fit_bonus = 0
+            if width_ratio > 1.02 and f.get("fit_type") == "Large Fit":
+                fit_bonus = 3
+            elif width_ratio < 0.98 and (f.get("lens_width_mm", 50) <= 50 or "Skyler" in f.get("name", "")):
+                fit_bonus = 2
+
+            calculated_score = min(98, max(88, base_sc + gen_bonus + fit_bonus))
+            scored_candidates.append((calculated_score, f))
+
+        # Сортируем кандидатов по убыванию совместимости
+        scored_candidates.sort(key=lambda x: x[0], reverse=True)
+
+        # Отбираем ТОП-5 разнообразных моделей:
+        # Сначала берем лучшие модели уникальных форм (panto, round, cat_eye, wayfarer, geometric, rectangular)
+        selected_candidates: List[Tuple[int, dict]] = []
+        seen_shapes = set()
+
+        for sc, f in scored_candidates:
+            sh = f.get("shape")
+            if sh not in seen_shapes:
+                seen_shapes.add(sh)
+                selected_candidates.append((sc, f))
+                if len(selected_candidates) == 5:
+                    break
+
+        # Если уникальных форм меньше 5, дополняем другими топовыми моделями (разные поколения / размеры)
+        if len(selected_candidates) < 5:
+            for sc, f in scored_candidates:
+                if not any(f["frame_id"] == sel[1]["frame_id"] for sel in selected_candidates):
+                    selected_candidates.append((sc, f))
+                    if len(selected_candidates) == 5:
+                        break
+
+        top_alternatives: List[AlternativeFrame] = []
+        for sc, f in selected_candidates[:5]:
+            sh = f.get("shape", "wayfarer")
             why_better = face_reasons.get(
                 sh,
-                f"Форма «{SHAPE_NAMES_RU.get(sh, sh)}» создаёт визуальный баланс с контуром лица."
+                f"Форма «{SHAPE_NAMES_RU.get(sh, sh)}» создаёт оптический баланс с контуром лица."
             )
+            if f.get("optometric_notes"):
+                why_better = f"{why_better} {f.get('optometric_notes')}"
 
             alt = AlternativeFrame(
                 frame_id=f["frame_id"],
                 name=f["name"],
                 brand=f["brand"],
                 shape=sh,
-                shape_name_ru=SHAPE_NAMES_RU.get(sh, sh.title()),
-                match_score=min(98, sc + 2),
+                shape_name_ru=f.get("shape_name_ru", SHAPE_NAMES_RU.get(sh, sh.title())),
+                profile_id=f.get("profile_id"),
+                match_score=sc,
                 why_better_ru=why_better,
                 svg_url="",
-                color=f["color"],
-                material=f["material"],
-                dimensions=f["dimensions"]
+                color=f.get("color", ""),
+                material=f.get("material", ""),
+                dimensions=f.get("dimensions", ""),
+                model_line=f.get("model_line"),
+                generation=f.get("generation"),
+                camera=f.get("camera"),
+                display=f.get("display"),
+                has_display=f.get("has_display", False),
+                audio=f.get("audio"),
+                price=f.get("price"),
+                currency=f.get("currency", "₸"),
+                weight_g=f.get("weight_g"),
+                fit_type=f.get("fit_type"),
+                smart_features=f.get("style_tags", [])
             )
             top_alternatives.append(alt)
 

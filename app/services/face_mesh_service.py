@@ -154,13 +154,14 @@ class FaceMeshService:
         Определяет форму оправы (9 категорий), соотношение ширины к скулам и центровку.
         Обернут в полный блок перехвата исключений: сбой эвристики никогда не ломает запрос.
         """
-        default_shape = (frame_shape_hint.strip().lower() if frame_shape_hint and frame_shape_hint.strip() else "rectangular")
+        has_hint = bool(frame_shape_hint and frame_shape_hint.strip() and frame_shape_hint.strip().lower() not in ("none", "no_glasses", "bare_face"))
+        default_shape = (frame_shape_hint.strip().lower() if has_hint else "none")
         fallback_res = {
-            "has_glasses": True,
+            "has_glasses": has_hint,
             "shape": default_shape,
-            "width_ratio": 1.04,
+            "width_ratio": 1.04 if has_hint else 1.0,
             "aspect_ratio": 1.45,
-            "lens_height_px": 45.0
+            "lens_height_px": 45.0 if has_hint else 0.0
         }
         try:
             h, w = rgb_img.shape[:2]
@@ -349,8 +350,35 @@ class FaceMeshService:
             detected_shape = max(shape_votes, key=lambda k: shape_votes[k])
             width_ratio = min(1.18, max(0.92, float(width_ratio)))
 
-            if frame_shape_hint and frame_shape_hint.strip():
+            if has_hint:
                 detected_shape = frame_shape_hint.strip().lower()
+                has_glasses = True
+            else:
+                # Автоматическая детекция: проверяем наличие замкнутого ободка и мостика
+                has_large_rim = (best_contour is not None and best_area > 200)
+
+                # Проверка контраста и горизонтальных линий на переносице
+                bx1 = int(min(landmarks[133].x, landmarks[362].x) * w)
+                bx2 = int(max(landmarks[133].x, landmarks[362].x) * w)
+                by1 = int(min(landmarks[168].y, landmarks[6].y) * h - 5)
+                by2 = int(max(landmarks[168].y, landmarks[6].y) * h + 15)
+                has_bridge_line = False
+                if by2 > by1 and bx2 > bx1:
+                    bridge_patch = gray[by1:by2, bx1:bx2]
+                    if bridge_patch.size > 0:
+                        b_canny = cv2.Canny(bridge_patch, 40, 110)
+                        lines = cv2.HoughLinesP(b_canny, 1, np.pi/180, threshold=12, minLineLength=int((bx2-bx1)*0.25), maxLineGap=4)
+                        has_bridge_line = (lines is not None and len(lines) >= 2)
+
+                has_glasses = bool(has_large_rim and has_bridge_line)
+                if not has_glasses:
+                    return {
+                        "has_glasses": False,
+                        "shape": "none",
+                        "width_ratio": 1.0,
+                        "aspect_ratio": 1.45,
+                        "lens_height_px": 0.0
+                    }
 
             return {
                 "has_glasses": True,

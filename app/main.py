@@ -8,9 +8,10 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import ValidationError
 
-from app.models.face_analysis import AnalyzeResponse, AnalyzeRequest
+from app.models.face_analysis import AnalyzeResponse, AnalyzeRequest, ChatRequest, ChatResponse
 from app.services.face_mesh_service import FaceMeshService, extract_and_decode_base64
 from app.services.catalog_service import CatalogService
+from app.services.chat_service import ChatService
 
 app = FastAPI(
     title="abooptika — AI Optical Fitting & Geometry Analysis API",
@@ -158,8 +159,49 @@ async def analyze_face(request: Request):
         )
 
 @app.get("/api/catalog")
-async def get_catalog(shape: Optional[str] = Query(None)):
+async def get_catalog(
+    shape: Optional[str] = Query(None, description="Фильтр по форме (wayfarer, panto, cat_eye, round, geometric, rectangular, aviator)"),
+    generation: Optional[str] = Query(None, description="Фильтр по поколению (Gen 1, Gen 2, Gen 3)"),
+    brand: Optional[str] = Query(None, description="Фильтр по бренду (Ray-Ban Meta, Stories, Meta)"),
+    profile: Optional[str] = Query(None, description="Фильтр по профилю (profile-wayfarer, profile-round-headliner, profile-cateye-skyler, profile-aviator, profile-shield-display)")
+):
     frames = CatalogService.get_all_frames()
     if shape:
-        frames = [f for f in frames if f["shape"].lower() == shape.lower()]
-    return {"total": len(frames), "frames": frames}
+        frames = [f for f in frames if f.get("shape", "").lower() == shape.lower()]
+    if generation:
+        frames = [f for f in frames if generation.lower() in f.get("generation", "").lower()]
+    if brand:
+        frames = [f for f in frames if brand.lower() in f.get("brand", "").lower()]
+    if profile:
+        frames = [f for f in frames if f.get("profile_id") == profile]
+    return {
+        "catalog": "Meta & Ray-Ban Meta Smart Glasses",
+        "total": len(frames),
+        "frames": frames
+    }
+
+@app.get("/api/catalog/profiles")
+async def get_catalog_profiles():
+    """Возвращает 5 ключевых геометрических профилей смарт-очков Meta и их размерные сетки."""
+    profiles = CatalogService.get_all_profiles()
+    return {
+        "source": "https://www.meta.com/ai-glasses/shop-all/",
+        "total": len(profiles),
+        "total_profiles": len(profiles),
+        "profiles": profiles
+    }
+
+@app.post("/api/chat", response_model=ChatResponse)
+async def chat_with_optometrist(chat_req: ChatRequest):
+    """
+    Интерактивный ИИ-консультант AbooOptika по смарт-очкам Meta и биометрии лица.
+    Работает в реальном времени через защищенный эндпоинт Gemini API.
+    """
+    if not chat_req.messages:
+        raise HTTPException(status_code=400, detail="Список сообщений не может быть пустым")
+
+    response = ChatService.generate_reply(
+        messages=chat_req.messages,
+        client_context=chat_req.client_context
+    )
+    return response
