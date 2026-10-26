@@ -416,5 +416,10 @@ def test_ai_chat_widget_in_frontend():
     assert avatar_res.status_code == 200
     assert "image/png" in avatar_res.headers.get("content-type", "")
 
+    # Проверка мобильного позиционирования виджета (поднятие над системной панелью)
+    assert "chat-widget-container" in css_res.text
+    assert "84px" in css_res.text
+    assert "safe-area-inset-bottom" in css_res.text
+
 
 

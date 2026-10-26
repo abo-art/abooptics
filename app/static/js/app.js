@@ -737,6 +737,18 @@ class AboOptikaApp {
       });
     }
 
+    // Закрытие при тапе / клике вне панели чата
+    document.addEventListener('click', (e) => {
+      if (
+        this.state.chatOpen &&
+        this.el.chatPanel &&
+        !this.el.chatPanel.contains(e.target) &&
+        !this.el.btnToggleChat.contains(e.target)
+      ) {
+        this.toggleChat(false);
+      }
+    });
+
     // Ввод сообщения
     if (this.el.chatInput && this.el.btnChatSend) {
       this.el.chatInput.addEventListener('input', () => {

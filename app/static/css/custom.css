@@ -271,3 +271,38 @@ body {
   image-rendering: crisp-edges;
   aspect-ratio: 1 / 1;
 }
+
+/* ==========================================================================
+   Mobile Responsive Positioning for AI Chat Widget (Above Browser Navigation Bar)
+   ========================================================================== */
+
+#chat-widget-container {
+  bottom: 24px;
+  right: 24px;
+}
+
+@media (max-width: 640px) {
+  #chat-widget-container {
+    /* Lift floating button up by 84px+safe-area to stay completely clear of mobile browser address bar */
+    bottom: 84px !important;
+    bottom: calc(84px + env(safe-area-inset-bottom, 0px)) !important;
+    right: 16px !important;
+  }
+
+  #chat-panel {
+    /* Full mobile responsiveness: fits within phone viewport without clipping */
+    width: calc(100vw - 32px) !important;
+    max-width: 390px !important;
+    height: min(520px, calc(100dvh - 180px)) !important;
+    height: min(520px, calc(100vh - 180px)) !important; /* fallback */
+    max-height: calc(100dvh - 180px) !important;
+    max-height: calc(100vh - 180px) !important; /* fallback */
+    margin-bottom: 10px !important;
+    border-radius: 1.5rem !important;
+  }
+
+  #btn-toggle-chat {
+    padding: 8px 14px !important;
+    box-shadow: 0 10px 28px rgba(7, 24, 64, 0.75) !important;
+  }
+}
