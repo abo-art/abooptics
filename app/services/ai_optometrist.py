@@ -10,7 +10,7 @@ load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent"
+GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent"
 GEMINI_FALLBACK_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent"
 
 
@@ -178,6 +178,9 @@ class AIOptometristService:
             "diamond": {"cat_eye": 98, "panto": 94, "round": 92, "wayfarer": 89, "rectangular": 86, "aviator": 84, "square": 58}
         }
 
+        detected_shape = worn_fit_dict.get("detected_shape", "rectangular")
+        shape_name = worn_fit_dict.get("detected_shape_name_ru", detected_shape)
+        width_ratio = worn_fit_dict.get("width_ratio", 1.0)
         shape_score = base_scores.get(face_shape_id, {}).get(detected_shape, 82)
         penalty = 0
         if width_ratio > 1.04:

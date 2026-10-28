@@ -421,5 +421,128 @@ def test_ai_chat_widget_in_frontend():
     assert "84px" in css_res.text
     assert "safe-area-inset-bottom" in css_res.text
 
+def test_ai_chat_open_scope_streetwear_and_offtopic():
+    """Проверка директивы Open Scope: консультация по streetwear-стилю и ответ на отвлеченные вопросы"""
+    # 1. Streetwear / стиль
+    payload_style = {
+        "messages": [
+            {"role": "user", "content": "Посоветуй крутой streetwear-аутфит с оверсайз худи под очки Meta Fury"}
+        ]
+    }
+    res = client.post("/api/chat", json=payload_style)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["success"] is True
+    reply = data["reply"].lower()
+    # Консультант дает развернутый ответ по стилю и аутфиту
+    assert any(w in reply for w in ["streetwear", "аутфит", "худи", "fury", "стил", "лук", "кроссовк", "карго"])
+    assert len(data["reply"]) > 50
 
+    # 2. Бытовой / отвлеченный вопрос (Open Scope: не отказывает и отвечает остроумно от AbooOptika)
+    payload_offtopic = {
+        "messages": [
+            {"role": "user", "content": "Как сегодня одеться для прогулки по городу?"}
+        ]
+    }
+    res_off = client.post("/api/chat", json=payload_offtopic)
+    assert res_off.status_code == 200
+    data_off = res_off.json()
+    assert data_off["success"] is True
+    assert len(data_off["reply"]) > 40
+    assert "aboooptika" in data_off["reply"].lower()
 
+def test_ai_chat_anti_loop_and_continuous_dialog_history():
+    """Проверка директив Anti-Loop и Dynamic Context: сохранение истории диалога и исключение сброса на дефолтное приветствие"""
+    from app.services.chat_service import ChatService
+    from app.models.face_analysis import ChatMessage
+
+    # 1. Форматирование истории: очистка, удаление изолированного системного приветствия, чередование
+    raw_history = [
+        ChatMessage(role="assistant", content="Здравствуйте! Я стилист AbooOptika."),
+        ChatMessage(role="user", content="Меня зовут Алибек, я ищу очки для спорта."),
+        ChatMessage(role="assistant", content="Отлично, Алибек! Рекомендую Oakley Vanguard."),
+        ChatMessage(role="user", content="Какая цена у этой модели в тенге?")
+    ]
+    gemini_contents = ChatService._format_gemini_contents(raw_history)
+    assert gemini_contents[0]["role"] == "user"
+    assert "Алибек" in gemini_contents[0]["parts"][0]["text"]
+    assert len(gemini_contents) == 3
+    assert gemini_contents[1]["role"] == "model"
+    assert gemini_contents[2]["role"] == "user"
+
+    # 2. Непрерывность диалога: второй ход не должен сбрасываться на шаблонное дефолтное приветствие
+    payload_multiturn = {
+        "messages": [
+            {"role": "assistant", "content": "Здравствуйте! Я персональный ИИ-стилист AbooOptika."},
+            {"role": "user", "content": "Меня зовут Алибек, порекомендуй спортивную модель очков."},
+            {"role": "assistant", "content": "Очень приятно, Алибек! Рассмотрите Oakley Vanguard или Meta Fury."},
+            {"role": "user", "content": "Напомни, как меня зовут, и какая цена у Vanguard?"}
+        ]
+    }
+    res = client.post("/api/chat", json=payload_multiturn)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["success"] is True
+    reply = data["reply"]
+    # Не сбрасывается на дефолтное первое приветствие
+    assert "Я ваш персональный ИИ-консультант по всей коллекции смарт-очков Meta 2025 года.\n\nУ нас представлены все 25" not in reply
+    assert len(reply) > 30
+
+def test_ai_chat_rayban_meta_gen3_direct_answer_after_greeting():
+    """
+    Тест конкретного сценария из ТЗ:
+    При отправке вопроса 'расскажи мне про рейбан мета ген 3' сразу после первичного
+    приветствия виджета ИИ обязан ответить конкретно про модель Gen 3 / Zena,
+    НЕ присылая дефолтное приветствие с общим описанием 25 моделей.
+    """
+    payload = {
+        "messages": [
+            {
+                "role": "assistant",
+                "content": "Здравствуйте! Я персональный ИИ-стилист и эксперт AbooOptika.\n\nЯ знаю все 25 моделей смарт-очков Meta...\nЧем я могу помочь вам прямо сейчас?"
+            },
+            {
+                "role": "user",
+                "content": "расскажи мне про рейбан мета ген 3"
+            }
+        ]
+    }
+    res = client.post("/api/chat", json=payload)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["success"] is True
+    reply = data["reply"]
+
+    # Проверка изоляции приветствия: никакого дефолтного вступительного перечисления
+    assert "Приветствую вас в салоне" not in reply
+    assert "У нас представлены все 25 актуальных моделей" not in reply
+    assert "Культовые классические: Ray-Ban Meta Wayfarer" not in reply
+
+    # Проверка экспертного ответа по модели Ray-Ban Meta Gen 3
+    reply_low = reply.lower()
+    assert any(term in reply_low for term in ["gen 3", "ген 3", "zena", "третье", "2025"])
+    assert any(term in reply_low for term in ["245 000", "ultra-wide", "камер", "тенге", "₸", "open-ear"])
+
+def test_ai_chat_dialogue_context_preservation_across_turns():
+    """
+    Тест сохранения контекста и истории сообщений (Chat History):
+    Пользователь задает короткий уточняющий вопрос 'а сколько они стоят?',
+    и ИИ отвечает на основе контекста предыдущей реплики без сброса на дефолтные фразы.
+    """
+    payload = {
+        "messages": [
+            {"role": "assistant", "content": "Здравствуйте! Чем могу помочь?"},
+            {"role": "user", "content": "Расскажи про модель Ray-Ban Meta Zena Gen 3"},
+            {"role": "assistant", "content": "Ray-Ban Meta Zena (Gen 3) — это новинка 2025 года с формой кошачий глаз и камерой 3K."},
+            {"role": "user", "content": "А сколько они стоят?"}
+        ]
+    }
+    res = client.post("/api/chat", json=payload)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["success"] is True
+    reply = data["reply"]
+
+    # Ответ должен содержать цену обсуждаемой модели (Zena Gen 3 = 245 000 ₸)
+    assert "Приветствую вас в салоне" not in reply
+    assert "245 000" in reply or "тенге" in reply.lower() or "₸" in reply
