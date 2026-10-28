@@ -77,18 +77,28 @@
       <div class="flex items-center gap-3">
         <a href="/" class="flex items-center group">
           <img src="/static/images/brand/logo.png" alt="abooptika" class="h-7 sm:h-8 w-auto object-contain transition-transform group-hover:scale-[1.02]">
-          <span class="hidden sm:inline-block ml-3 pl-3 border-l border-navy-900/15 text-[11px] font-bold tracking-wider uppercase text-navy-900/70">
+          <span data-i18n="header_subtitle" class="hidden sm:inline-block ml-3 pl-3 border-l border-navy-900/15 text-[11px] font-bold tracking-wider uppercase text-navy-900/70">
             Оптический анализ посадки
           </span>
         </a>
       </div>
 
-      <!-- Mode Selector (Consultant terminal toggle) -->
-      <div class="flex items-center gap-3">
+      <!-- Mode Selector & Language Switcher -->
+      <div class="flex items-center gap-2.5 sm:gap-3">
+        <!-- Language Switcher (RU | EN) for US hackathon jury -->
+        <div id="lang-switch-container" class="flex items-center bg-navy-50/90 rounded-xl p-0.5 border border-navy-900/15 shadow-sm">
+          <button id="lang-btn-ru" type="button" class="px-2.5 py-1 text-xs font-bold rounded-lg transition-all bg-navy-900 text-white shadow-sm" aria-label="Русский язык">
+            RU
+          </button>
+          <button id="lang-btn-en" type="button" class="px-2.5 py-1 text-xs font-bold rounded-lg transition-all text-navy-900 hover:text-navy-950" aria-label="English language">
+            EN
+          </button>
+        </div>
+
         <label class="flex items-center gap-2 cursor-pointer bg-navy-50/80 hover:bg-navy-100/70 px-3 py-1.5 rounded-xl border border-navy-900/15 transition-all">
           <input type="checkbox" id="salon-mode-toggle" class="sr-only peer">
           <div class="w-8 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-navy-900 relative"></div>
-          <span class="text-xs font-semibold text-navy-900 select-none">Режим консультанта</span>
+          <span class="text-xs font-semibold text-navy-900 select-none hidden sm:inline" data-i18n="salon_mode">Режим консультанта</span>
         </label>
       </div>
 
@@ -99,9 +109,9 @@
   <div id="salon-banner" class="hidden bg-navy-50 border-b border-navy-900/15 px-4 py-2 text-xs text-navy-900 flex items-center justify-between max-w-6xl mx-auto w-full">
     <div class="flex items-center gap-2">
       <span class="inline-block w-2 h-2 rounded-full bg-navy-900"></span>
-      <span class="font-bold">Терминал оптометриста / Салон Dostyk Plaza</span>
+      <span data-i18n="salon_banner_title" class="font-bold">Терминал оптометриста / Салон Dostyk Plaza</span>
     </div>
-    <div class="text-[11px] text-slate-500 font-medium">Инструмент подбора и оценки посадки в торговом зале</div>
+    <div data-i18n="salon_banner_sub" class="text-[11px] text-slate-500 font-medium">Инструмент подбора и оценки посадки в торговом зале</div>
   </div>
 
   <!-- ================= MAIN VIEW CONTAINER ================= -->
@@ -112,10 +122,10 @@
       
       <!-- Screen Header -->
       <div class="text-center mb-5">
-        <h1 class="text-2xl font-display font-extrabold text-navy-900 tracking-tight mb-1.5">
+        <h1 data-i18n="scan_title" class="text-2xl font-display font-extrabold text-navy-900 tracking-tight mb-1.5">
           Оценка посадки оправы
         </h1>
-        <p class="text-xs text-slate-600 max-w-sm mx-auto leading-relaxed">
+        <p data-i18n="scan_subtitle" class="text-xs text-slate-600 max-w-sm mx-auto leading-relaxed">
           Наденьте оправу с витрины и наведите фронтальную камеру для биометрического замера геометрии лица и ширины оправы
         </p>
       </div>
@@ -136,7 +146,7 @@
             <div class="w-2.5 h-2.5 rounded-full border border-navy-900/60 opacity-60"></div>
           </div>
           
-          <div id="camera-guide-badge" class="mt-4 px-3.5 py-1 rounded-full bg-white/95 text-navy-900 shadow-md border border-navy-900/15 text-[11px] font-bold">
+          <div id="camera-guide-badge" data-i18n="camera_guide" class="mt-4 px-3.5 py-1 rounded-full bg-white/95 text-navy-900 shadow-md border border-navy-900/15 text-[11px] font-bold">
             Лицо в надетой оправе внутри овала
           </div>
         </div>
@@ -149,11 +159,11 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
             </svg>
           </div>
-          <h3 class="text-sm font-bold text-navy-900 mb-1">Камера устройства</h3>
-          <p class="text-xs text-slate-500 max-w-xs mb-4">
+          <h3 data-i18n="camera_title" class="text-sm font-bold text-navy-900 mb-1">Камера устройства</h3>
+          <p data-i18n="camera_sub" class="text-xs text-slate-500 max-w-xs mb-4">
             Включите камеру смартфона или планшета стойки
           </p>
-          <button id="btn-start-camera" class="btn-brand-primary w-full max-w-xs py-2.5 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2">
+          <button id="btn-start-camera" data-i18n="btn_enable_camera" class="btn-brand-primary w-full max-w-xs py-2.5 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2">
             Включить камеру
           </button>
         </div>
@@ -163,7 +173,7 @@
           <button id="btn-toggle-mirror" title="Сменить зеркальный режим" class="py-1 px-3 rounded-full bg-white/95 text-navy-900 border border-navy-900/20 text-xs font-bold shadow-md hover:bg-navy-50 transition-colors">
             Оси: 1:1
           </button>
-          <button id="btn-flip-camera" title="Переключить камеру" class="py-1 px-3 rounded-full bg-white/95 text-navy-900 border border-navy-900/20 text-xs font-bold shadow-md hover:bg-navy-50 transition-colors">
+          <button id="btn-flip-camera" title="Переключить камеру" data-i18n="btn_flip_camera" class="py-1 px-3 rounded-full bg-white/95 text-navy-900 border border-navy-900/20 text-xs font-bold shadow-md hover:bg-navy-50 transition-colors">
             Камера
           </button>
         </div>
@@ -172,12 +182,12 @@
 
       <!-- Action Capture Buttons -->
       <div class="w-full mt-4 flex flex-col gap-2">
-        <button id="btn-capture" disabled class="btn-brand-primary w-full py-3.5 px-5 rounded-xl font-bold text-xs tracking-wide flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
+        <button id="btn-capture" data-i18n="btn_capture" disabled class="btn-brand-primary w-full py-3.5 px-5 rounded-xl font-bold text-xs tracking-wide flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
           Выполнить биометрическое сканирование
         </button>
 
         <label class="btn-brand-outline w-full py-2.5 px-4 rounded-xl text-xs font-bold cursor-pointer text-center">
-          Загрузить фото примерки из галереи
+          <span data-i18n="btn_upload_photo">Загрузить фото примерки из галереи</span>
           <input type="file" id="file-input" accept="image/*" class="hidden">
         </label>
       </div>
@@ -185,21 +195,21 @@
       <!-- Quick Demo Presets -->
       <div class="w-full mt-5 pt-4 border-t border-navy-900/10">
         <div class="flex items-center justify-between mb-2">
-          <span class="text-[11px] font-bold text-navy-900/70 uppercase tracking-wider">Тестовые сценарии:</span>
-          <span class="text-[10px] font-bold text-navy-900 bg-navy-50 px-2 py-0.5 rounded border border-navy-900/10">1-клик тест</span>
+          <span data-i18n="demo_title" class="text-[11px] font-bold text-navy-900/70 uppercase tracking-wider">Тестовые сценарии:</span>
+          <span data-i18n="demo_badge" class="text-[10px] font-bold text-navy-900 bg-navy-50 px-2 py-0.5 rounded border border-navy-900/10">1-клик тест</span>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
           <button id="btn-demo-no-glasses" class="p-2.5 rounded-xl bg-white hover:bg-navy-50/50 border border-navy-900/15 text-left transition-all shadow-sm hover:border-navy-900/30">
-            <div class="text-xs font-bold text-navy-900">👤 Без очков</div>
-            <div class="text-[10px] font-semibold text-sky-700 mt-0.5">Первичный подбор оправы</div>
+            <div data-i18n="demo_no_glasses_title" class="text-xs font-bold text-navy-900">👤 Без очков</div>
+            <div data-i18n="demo_no_glasses_sub" class="text-[10px] font-semibold text-sky-700 mt-0.5">Первичный подбор оправы</div>
           </button>
           <button id="btn-demo-wearing-square" class="p-2.5 rounded-xl bg-white hover:bg-navy-50/50 border border-navy-900/15 text-left transition-all shadow-sm hover:border-navy-900/30">
-            <div class="text-xs font-bold text-navy-900">👓 В квадратной</div>
-            <div class="text-[10px] font-semibold text-amber-700 mt-0.5">Ширина 143 мм (Широковата)</div>
+            <div data-i18n="demo_square_title" class="text-xs font-bold text-navy-900">👓 В квадратной</div>
+            <div data-i18n="demo_square_sub" class="text-[10px] font-semibold text-amber-700 mt-0.5">Ширина 143 мм (Широковата)</div>
           </button>
           <button id="btn-demo-wearing-round" class="p-2.5 rounded-xl bg-white hover:bg-navy-50/50 border border-navy-900/15 text-left transition-all shadow-sm hover:border-navy-900/30">
-            <div class="text-xs font-bold text-navy-900">👓 В круглой</div>
-            <div class="text-[10px] font-semibold text-emerald-700 mt-0.5">Ширина 135 мм (Соответствует)</div>
+            <div data-i18n="demo_round_title" class="text-xs font-bold text-navy-900">👓 В круглой</div>
+            <div data-i18n="demo_round_sub" class="text-[10px] font-semibold text-emerald-700 mt-0.5">Ширина 135 мм (Соответствует)</div>
           </button>
         </div>
       </div>
@@ -213,7 +223,7 @@
 
       <div class="w-10 h-10 rounded-full border-3 border-navy-900/20 border-t-navy-900 animate-spin mb-4"></div>
 
-      <h3 class="text-base font-bold text-navy-900 mb-1">Биометрический расчет</h3>
+      <h3 data-i18n="loading_title" class="text-base font-bold text-navy-900 mb-1">Биометрический расчет</h3>
       <p id="loading-step-text" class="text-xs text-navy-700 max-w-xs h-8 font-medium">
         Поиск ключевых точек MediaPipe Face Mesh...
       </p>
@@ -234,7 +244,7 @@
         <div class="flex-1 w-full text-center sm:text-left">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1.5">
             <div>
-              <span class="text-[10px] text-navy-900/60 uppercase tracking-wider font-bold block">Анатомический тип лица</span>
+              <span data-i18n="face_type_label" class="text-[10px] text-navy-900/60 uppercase tracking-wider font-bold block">Анатомический тип лица</span>
               <h3 id="diag-shape-title" class="text-lg font-extrabold text-navy-900">Квадратное лицо</h3>
             </div>
             <span id="diag-shape-confidence" class="self-center sm:self-auto text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-200">
@@ -249,19 +259,19 @@
           <!-- Таблица точных замеров -->
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
             <div class="bg-navy-50/70 p-2.5 rounded-xl border border-navy-900/10">
-              <span class="text-[10px] text-slate-500 font-medium block">Длина / Скулы</span>
+              <span data-i18n="metric_hw_label" class="text-[10px] text-slate-500 font-medium block">Длина / Скулы</span>
               <span id="metric-hw" class="font-extrabold text-navy-900 text-sm">1.25</span>
             </div>
             <div class="bg-navy-50/70 p-2.5 rounded-xl border border-navy-900/10">
-              <span class="text-[10px] text-slate-500 font-medium block">Челюсть / Скулы</span>
+              <span data-i18n="metric_jc_label" class="text-[10px] text-slate-500 font-medium block">Челюсть / Скулы</span>
               <span id="metric-jc" class="font-extrabold text-navy-900 text-sm">0.92</span>
             </div>
             <div class="bg-navy-50/70 p-2.5 rounded-xl border border-navy-900/10">
-              <span class="text-[10px] text-slate-500 font-medium block">Угол челюсти</span>
+              <span data-i18n="metric_chin_label" class="text-[10px] text-slate-500 font-medium block">Угол челюсти</span>
               <span id="metric-chin" class="font-extrabold text-navy-900 text-sm">170°</span>
             </div>
             <div class="bg-navy-50/70 p-2.5 rounded-xl border border-navy-900/10">
-              <span class="text-[10px] text-slate-500 font-medium block">Симметрия</span>
+              <span data-i18n="metric_sym_label" class="text-[10px] text-slate-500 font-medium block">Симметрия</span>
               <span id="metric-sym" class="font-extrabold text-emerald-700 text-sm">97.5%</span>
             </div>
           </div>
@@ -297,7 +307,7 @@
             <span class="inline-flex items-center gap-2 px-2.5 py-1 rounded-md text-[10px] font-extrabold bg-navy-900 text-white uppercase tracking-wider">
               <img src="/static/images/brand/ai-avatar.png" alt="ИИ-Оптометрист" class="w-4 h-4 rounded-full object-cover border border-white/30 shrink-0">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              Заключение эксперта-оптометриста AbooOptika
+              <span data-i18n="verdict_banner">Заключение эксперта-оптометриста AbooOptika</span>
             </span>
             <span id="ai-model-pill" class="text-[10px] font-bold text-navy-900/70 bg-navy-100/60 px-2 py-0.5 rounded border border-navy-900/10">
               AbooOptika AI Biometrics
@@ -310,7 +320,7 @@
           <!-- Специализированные блоки анализа: Мостик и Заушники -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 pt-3 border-t border-navy-900/10">
             <div class="bg-white/80 p-2.5 rounded-lg border border-navy-900/10">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-navy-900/70 block mb-0.5">
+              <span data-i18n="bridge_label" class="text-[10px] font-bold uppercase tracking-wider text-navy-900/70 block mb-0.5">
                 Мостик & Переносица:
               </span>
               <p id="bridge-nuance-text" class="text-[11px] text-slate-700 font-medium leading-snug">
@@ -318,7 +328,7 @@
               </p>
             </div>
             <div class="bg-white/80 p-2.5 rounded-lg border border-navy-900/10">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-navy-900/70 block mb-0.5">
+              <span data-i18n="temple_label" class="text-[10px] font-bold uppercase tracking-wider text-navy-900/70 block mb-0.5">
                 Заушники & Батареи:
               </span>
               <p id="temple-nuance-text" class="text-[11px] text-slate-700 font-medium leading-snug">
@@ -386,7 +396,7 @@
           </div>
           <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-navy-50 text-navy-900 border border-navy-900/15 self-start sm:self-auto">
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            Официальный каталог Meta 2025
+            <span data-i18n="catalog_badge">Официальный каталог Meta 2025</span>
           </span>
         </div>
 
@@ -398,11 +408,11 @@
 
       <!-- STICKY ACTION BUTTONS BAR -->
       <div class="sticky bottom-4 z-40 w-full max-w-xl mx-auto brand-panel p-2.5 rounded-2xl border border-navy-900/15 shadow-xl flex items-center justify-between gap-2">
-        <button id="btn-open-pass" class="btn-brand-primary flex-1 py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5">
+        <button id="btn-open-pass" data-i18n="btn_open_pass" class="btn-brand-primary flex-1 py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5">
           Показать консультанту в зале
         </button>
 
-        <button id="btn-new-scan" class="btn-brand-outline py-2.5 px-4 rounded-xl text-xs font-bold transition-all">
+        <button id="btn-new-scan" data-i18n="btn_new_scan" class="btn-brand-outline py-2.5 px-4 rounded-xl text-xs font-bold transition-all">
           Новый скан
         </button>
       </div>
@@ -414,7 +424,7 @@
   <!-- ================= MODAL: ПАСПОРТ ПОДБОРА ДЛЯ КОНСУЛЬТАНТА ================= -->
   <div id="pass-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-lg rounded-2xl p-6 border border-navy-900/20 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-      <button id="btn-close-pass" class="absolute top-4 right-4 text-slate-400 hover:text-navy-900 no-print text-sm font-bold">
+      <button id="btn-close-pass" data-i18n="btn_close_pass" class="absolute top-4 right-4 text-slate-400 hover:text-navy-900 no-print text-sm font-bold">
         Закрыть
       </button>
 
@@ -429,9 +439,9 @@
     <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
       <div class="flex items-center gap-3">
         <img src="/static/images/brand/logo.png" alt="abooptika" class="h-6 w-auto object-contain opacity-90">
-        <span>© 2026 abooptika. Профессиональный инструмент оптического подбора в салоне.</span>
+        <span data-i18n="footer_copy">© 2026 abooptika. Профессиональный инструмент оптического подбора в салоне.</span>
       </div>
-      <div class="text-navy-900/60 font-semibold text-[11px]">
+      <div data-i18n="footer_tech" class="text-navy-900/60 font-semibold text-[11px]">
         MediaPipe Face Mesh • Геометрический анализ посадки
       </div>
     </div>
@@ -461,7 +471,7 @@
                 Online
               </span>
             </div>
-            <p class="text-[10px] text-slate-200 font-medium">Консультант по смарт-очкам Meta</p>
+            <p data-i18n="chat_subtitle" class="text-[10px] text-slate-200 font-medium">Консультант по смарт-очкам Meta</p>
           </div>
         </div>
 
@@ -485,7 +495,7 @@
           <span class="text-emerald-300">👤</span>
           <span id="chat-bio-context-text" class="text-white">Биометрия лица учтена</span>
         </span>
-        <span class="px-2 py-0.5 rounded-md bg-white/15 text-[10px] font-bold text-white border border-white/20">Персонализация</span>
+        <span data-i18n="chat_personalization" class="px-2 py-0.5 rounded-md bg-white/15 text-[10px] font-bold text-white border border-white/20">Персонализация</span>
       </div>
 
       <!-- Messages Body -->
@@ -504,6 +514,7 @@
       <form id="chat-form" class="p-3.5 border-t border-white/15 flex items-center gap-2.5"
             style="background-color: #071840 !important; border-top: 1px solid rgba(255,255,255,0.15) !important;">
         <input id="chat-input" type="text" autocomplete="off"
+               data-i18n-ph="chat_placeholder"
                placeholder="Спросите о моделях Meta, подборе или ценах..."
                class="flex-1 rounded-2xl px-4 py-2.5 text-xs sm:text-[13px] text-white placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-white transition-all font-medium"
                style="background-color: #0F2D6B !important; color: #FFFFFF !important; border: 1.5px solid rgba(255,255,255,0.25) !important;">
@@ -532,7 +543,7 @@
       </div>
 
       <div class="text-left hidden sm:block pr-1">
-        <div class="text-xs font-black tracking-wide text-white leading-tight">ИИ-Консультант</div>
+        <div data-i18n="chat_trigger_title" class="text-xs font-black tracking-wide text-white leading-tight">ИИ-Консультант</div>
         <div class="text-[10px] text-slate-200 font-semibold">Meta Smart Glasses</div>
       </div>
 

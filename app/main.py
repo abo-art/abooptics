@@ -202,6 +202,7 @@ async def chat_with_optometrist(chat_req: ChatRequest):
 
     response = ChatService.generate_reply(
         messages=chat_req.messages,
-        client_context=chat_req.client_context
+        client_context=chat_req.client_context,
+        language=chat_req.language or "ru"
     )
     return response

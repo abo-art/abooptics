@@ -546,3 +546,87 @@ def test_ai_chat_dialogue_context_preservation_across_turns():
     # Ответ должен содержать цену обсуждаемой модели (Zena Gen 3 = 245 000 ₸)
     assert "Приветствую вас в салоне" not in reply
     assert "245 000" in reply or "тенге" in reply.lower() or "₸" in reply
+
+def test_multilingual_language_switch_in_html():
+    """Проверка наличия интерактивного переключателя RU | EN в HTML для жюри из США"""
+    index_path = os.path.join(STATIC_DIR, "index.html")
+    with open(index_path, "r", encoding="utf-8") as f:
+        html = f.read()
+
+    assert 'id="lang-switch-container"' in html
+    assert 'id="lang-btn-ru"' in html
+    assert 'id="lang-btn-en"' in html
+    assert 'data-i18n="header_subtitle"' in html
+    assert 'data-i18n="scan_title"' in html
+    assert 'data-i18n="btn_capture"' in html
+
+def test_multilingual_i18n_dictionary_in_app_js():
+    """Проверка наличия словаря I18N с RU и EN ветками в app.js"""
+    app_js_path = os.path.join(STATIC_DIR, "js", "app.js")
+    with open(app_js_path, "r", encoding="utf-8") as f:
+        js = f.read()
+
+    assert "const I18N =" in js
+    assert "ru: {" in js
+    assert "en: {" in js
+    assert "Frame Fit Assessment" in js
+    assert "AbooOptika Optometrist Fit Verdict" in js
+    assert "setLanguage(" in js
+
+def test_ai_chat_bilingual_english_query_for_us_jury():
+    """
+    Тест поддержки английского языка для американского жюри хакатона:
+    Запрос на английском языке 'tell me about rayban meta gen 3' должен возвращать
+    экспертный англоязычный ответ с характеристиками Gen 3 и ценами в ₸ и USD.
+    """
+    payload = {
+        "messages": [
+            {
+                "role": "assistant",
+                "content": "Hello! I am your personal AI stylist and expert at AbooOptika.\nHow can I assist you right now?"
+            },
+            {
+                "role": "user",
+                "content": "tell me about rayban meta gen 3"
+            }
+        ],
+        "language": "en"
+    }
+    res = client.post("/api/chat", json=payload)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["success"] is True
+    reply = data["reply"]
+
+    # Проверка, что ответ на английском
+    reply_low = reply.lower()
+    assert "ray-ban meta zena (gen 3)" in reply_low or "gen 3" in reply_low
+    assert "usd" in reply_low or "$" in reply
+    assert "camera" in reply_low or "ultra-wide" in reply_low
+    assert "Приветствую" not in reply
+
+    # Проверка подсказок на английском
+    assert len(data["suggested_prompts"]) > 0
+    assert any("gen 3" in p.lower() or "usd" in p.lower() or "zena" in p.lower() for p in data["suggested_prompts"])
+
+def test_ai_chat_bilingual_english_pricing_query():
+    """
+    Тест запроса цен на английском языке:
+    ИИ возвращает актуальный прайс-лист в KZT и долларах США (~$USD).
+    """
+    payload = {
+        "messages": [
+            {"role": "user", "content": "How much do the glasses cost in USD and KZT?"}
+        ],
+        "language": "en"
+    }
+    res = client.post("/api/chat", json=payload)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["success"] is True
+    reply = data["reply"]
+    reply_low = reply.lower()
+
+    assert "usd" in reply_low or "$" in reply
+    assert "₸" in reply or "tenge" in reply_low or "kzt" in reply_low
+    assert "wayfarer" in reply_low or "zena" in reply_low or "lisa" in reply_low

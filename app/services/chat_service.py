@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import logging
 from typing import Dict, Any, Optional, List
@@ -38,12 +39,14 @@ class ChatService:
     def generate_reply(
         cls,
         messages: List[ChatMessage],
-        client_context: Optional[Dict[str, Any]] = None
+        client_context: Optional[Dict[str, Any]] = None,
+        language: Optional[str] = "ru"
     ) -> ChatResponse:
         """
         Генерирует экспертный ответ консультанта AbooOptika.
         При наличии ключа обращается к Gemini API с передачей всей истории диалога,
         при отсутствии или ошибке задействует экспертный локальный движок.
+        Поддерживает мультиязычность (RU и EN) для международного жюри.
         """
         api_key = cls.get_api_key()
         last_user_message = ""
@@ -54,10 +57,10 @@ class ChatService:
 
         if not api_key:
             logger.info("GEMINI_API_KEY отсутствует, задействован локальный экспертный движок чата AbooOptika.")
-            fallback_text, suggested = cls._generate_fallback_reply(last_user_message, client_context, messages)
+            fallback_text, suggested = cls._generate_fallback_reply(last_user_message, client_context, messages, language)
             return ChatResponse(success=True, reply=fallback_text, suggested_prompts=suggested)
 
-        system_instruction = cls._build_system_instruction(client_context)
+        system_instruction = cls._build_system_instruction(client_context, language)
         contents = cls._format_gemini_contents(messages)
 
         # Вызов Gemini API с поддержкой непрерывного диалога через приоритетный список моделей
@@ -84,7 +87,7 @@ class ChatService:
                             parts = candidates[0]["content"].get("parts", [])
                             if parts and "text" in parts[0]:
                                 reply_text = parts[0]["text"].strip()
-                                suggested = cls._extract_or_generate_prompts(reply_text, client_context)
+                                suggested = cls._extract_or_generate_prompts(reply_text, client_context, language)
                                 return ChatResponse(
                                     success=True,
                                     reply=reply_text,
@@ -96,11 +99,15 @@ class ChatService:
                 logger.warning(f"Ошибка вызова Gemini Chat API ({model}): {e}")
 
         # Безопасный экспертный fallback при сбое сети
-        fallback_text, suggested = cls._generate_fallback_reply(last_user_message, client_context, messages)
+        fallback_text, suggested = cls._generate_fallback_reply(last_user_message, client_context, messages, language)
         return ChatResponse(success=True, reply=fallback_text, suggested_prompts=suggested)
 
     @classmethod
-    def _build_system_instruction(cls, client_context: Optional[Dict[str, Any]] = None) -> str:
+    def _build_system_instruction(
+        cls,
+        client_context: Optional[Dict[str, Any]] = None,
+        language: Optional[str] = "ru"
+    ) -> str:
         """
         Формирует системный промпт консультанта AbooOptika
         с жестким соблюдением директив Open Scope, Anti-Loop и Dynamic Context.
@@ -160,10 +167,14 @@ class ChatService:
 Все последующие сообщения пользователя должны обрабатываться в режиме диалога, где ты отвечаешь непосредственно на заданный вопрос, опираясь на текущий контекст и системный промпт, без повтора вводных фраз.
 - Внимательно следи за нитью разговора: если пользователь задает короткие или уточняющие вопросы («а сколько они стоят?», «а какие цвета?», «а они подойдут мне?»), понимай, о какой именно модели шла речь в предыдущих сообщениях, и развивай беседу без сброса на дефолтные фразы.
 
-4. ЯЗЫК, ФОРМАТИРОВАНИЕ И БРЕНД ABOOOPTIKA:
-- Общайся на грамотном, естественном русском языке.
+4. ЯЗЫК, ФОРМАТИРОВАНИЕ И БРЕНД ABOOOPTIKA (MULTILINGUAL RU / EN):
+- Всегда общайся на том языке, на котором пишет пользователь (русский или английский).
+- IF THE USER COMMUNICATES IN ENGLISH (or if UI language is 'en'):
+  • Respond in natural, fluent, elegant, and professional English.
+  • Keep the same strict no-greeting and continuous dialogue rules (no introductory templates, start directly with the answer).
+  • When discussing prices, ALWAYS provide both Kazakhstani Tenge (₸) and approximate USD equivalent (~$USD at ~500 KZT/USD) so American hackathon judges and international clients easily understand (e.g., "185,000 ₸ (~$370 USD)", "245,000 ₸ (~$490 USD)", "290,000 ₸ (~$580 USD)", "350,000 ₸ (~$700 USD)").
+- Если пользователь пишет на русском: общайся на грамотном, естественном русском языке. Цены указывай в тенге (₸).
 - Структурируй ответы: применяй абзацы, списки, выделяй ключевые мысли и названия моделей **жирным шрифтом**.
-- Все цены всегда указывай в казахстанских тенге (₸).
 - Твой бренд — **AbooOptika**. Никогда не используй сторонние технические обозначения вроде «Smart Meta Lab» или «Gemini 3.5 Flash Lite».
 
 {context_text}
@@ -219,10 +230,87 @@ class ChatService:
     def _extract_or_generate_prompts(
         cls,
         reply_text: str,
-        client_context: Optional[Dict[str, Any]] = None
+        client_context: Optional[Dict[str, Any]] = None,
+        language: Optional[str] = "ru"
     ) -> List[str]:
-        """Генерирует 3-4 релевантных кликабельных подсказки для продолжения диалога."""
+        """Генерирует 3-4 релевантных кликабельных подсказки для продолжения диалога на соответствующем языке (RU или EN)."""
         low = reply_text.lower()
+        is_en = (language == "en") or bool(re.search(r'[a-zA-Z]{4,}', reply_text) and not re.search(r'[а-яА-ЯёЁ]{4,}', reply_text))
+
+        if is_en:
+            if "gen 3" in low or "zena" in low:
+                return [
+                    "How much is Ray-Ban Meta Zena Gen 3 in USD?",
+                    "What is the difference between Gen 2 and Gen 3?",
+                    "Which colors are available for Zena Gen 3?",
+                    "Can I install prescription lenses?"
+                ]
+            elif "wayfarer" in low or "headliner" in low or "skyler" in low:
+                return [
+                    "Compare Wayfarer and Headliner",
+                    "Which size should I pick: 50 or 53?",
+                    "How to book an in-store trial fitting?",
+                    "How much are Transitions GEN S lenses?"
+                ]
+            elif "streetwear" in low or "outfit" in low or "style" in low or "hoodie" in low or "sneaker" in low:
+                return [
+                    "Which outfit matches Ray-Ban Meta Wayfarer?",
+                    "How to pair glasses with an oversized hoodie?",
+                    "Recommend accessories for this look",
+                    "Which glasses fit a smart-casual office look?"
+                ]
+            elif "lisa" in low:
+                return [
+                    "How much is Adventurer LISA Edition in USD?",
+                    "Difference between Capri and Adventurer?",
+                    "Audio-only glasses without camera",
+                    "How to reserve a trial fitting at AbooOptika?"
+                ]
+            elif "audio" in low or "clubmaster" in low or "burbank" in low or "sound" in low:
+                return [
+                    "Compare Clubmaster Audio and Burbank Audio",
+                    "Can prescription lenses be installed?",
+                    "How does open-ear audio sound outdoors?",
+                    "Battery talk-time life?"
+                ]
+            elif "fury" in low or "vanguard" in low or "sport" in low or "oakley" in low:
+                return [
+                    "Tell me about Oakley Meta Vanguard",
+                    "What camera is inside Meta Fury?",
+                    "Weight of Swiss TR90 polymer frames?",
+                    "Book an in-store trial fitting"
+                ]
+            elif "lens" in low or "transition" in low or "prescription" in low:
+                return [
+                    "How do Transitions GEN S lenses work?",
+                    "Can prescription lenses be installed?",
+                    "Are polarized sun lenses available?",
+                    "How long does lens production take?"
+                ]
+            elif "price" in low or "cost" in low or "usd" in low or "dollar" in low or "tenge" in low or "₸" in low:
+                return [
+                    "Tell me about Ray-Ban Meta Wayfarer",
+                    "How much is Ray-Ban Meta Zena Gen 3?",
+                    "What makes LISA Edition special?",
+                    "How to book an in-store trial?"
+                ]
+            elif client_context and client_context.get("face_shape_ru"):
+                shape = client_context.get("face_shape_en") or client_context["face_shape_ru"]
+                return [
+                    f"Why is this frame optimal for {shape}?",
+                    "Are Transitions GEN S lenses available?",
+                    "Show Oakley Meta sport models",
+                    "Print fitting slip for consultant"
+                ]
+            else:
+                return [
+                    "Tell me about Ray-Ban Meta Gen 3",
+                    "Recommend smart glasses for my face shape",
+                    "Audio-only glasses without cameras for office",
+                    "How much do top models cost in USD?"
+                ]
+
+        # Русские подсказки
         if "gen 3" in low or "ген 3" in low or "zena" in low:
             return [
                 "Сколько стоят Ray-Ban Meta Zena Gen 3?",
@@ -300,19 +388,246 @@ class ChatService:
         cls,
         user_message: str,
         client_context: Optional[Dict[str, Any]] = None,
-        messages: Optional[List[ChatMessage]] = None
+        messages: Optional[List[ChatMessage]] = None,
+        language: Optional[str] = "ru"
     ) -> tuple[str, List[str]]:
         """
         Интеллектуальный экспертный локальный движок AbooOptika.
-        Обеспечивает строгое соблюдение требований ТЗ:
+        Обеспечивает строгое соблюдение требований ТЗ и мультиязычность (RU и EN):
         - Приветствие изолировано (показывается только один раз при открытии виджета)
         - Никаких шаблонных вводных фраз и перечислений ассортимента
         - Прямой и точный ответ на заданный вопрос пользователя
         - Сохранение контекста и истории всей переписки
+        - Автоматическая поддержка английского языка для международного жюри с ценами в ₸ и USD.
         """
         msg = user_message.lower().strip()
         face_shape_ru = client_context.get("face_shape_ru", "вашего лица") if client_context else "вашего типа лица"
+        face_shape_en = client_context.get("face_shape_en", "your face shape") if client_context else "your face shape"
 
+        # Детекция английского языка: параметр language == 'en' ИЛИ наличие английских слов без кириллицы
+        is_en = (
+            language == "en"
+            or (client_context and client_context.get("language") == "en")
+            or bool(re.search(r'[a-zA-Z]{3,}', user_message) and not re.search(r'[а-яА-ЯёЁ]{3,}', user_message))
+        )
+
+        # =========================================================================
+        # 1. АНГЛИЙСКИЙ ЯЗЫК (ENGLISH ENGINE FOR US HACKATHON JURY & CLIENTS)
+        # =========================================================================
+        if is_en:
+            is_gen3_en = (
+                any(w in msg for w in ["gen 3", "gen3", "zena", "orion", "third generation", "3rd gen", "generation 3"])
+                or ("meta" in msg and "3" in msg)
+                or ("rayban" in msg and "3" in msg)
+                or ("ray-ban" in msg and "3" in msg)
+                or ("glasses" in msg and "3" in msg)
+            )
+            if is_gen3_en:
+                reply = (
+                    "The third-generation flagship smart glasses **Ray-Ban Meta Gen 3 (2025)** at **AbooOptika** "
+                    "are headlined by **Ray-Ban Meta Zena (Gen 3)** (245,000 ₸ / ~$490 USD):\n\n"
+                    "• **Design & Ergonomics**: Trendsetting geometric cat-eye silhouette (dimensions: 52-21-145 mm), ultralight aerospace polymer frame weighing just 47 grams. Available in classic Shiny Black and caramel transparencies.\n"
+                    "• **12 MP Ultra-Wide Camera**: 122° field-of-view sensor with enhanced low-light optics and stabilized first-person 3K video recording.\n"
+                    "• **Studio Acoustics & Microphones**: 5-mic directional array with active wind suppression and custom open-ear speakers with 35% deeper bass than Gen 2.\n"
+                    "• **Battery & Fast Charge**: Up to 6 hours continuous runtime and up to 36 hours with the leather charging case (fast charge: 50% in 20 minutes).\n"
+                    "• **Multimodal Meta AI**: Instant voice assistance for visual identification, real-time sight translation, and hands-free notes.\n\n"
+                    "The Gen 3 lineup also includes the futuristic holographic prototype with full MicroLED waveguide displays — **Meta Orion** (650,000 ₸ / ~$1,300 USD)."
+                )
+                prompts = [
+                    "How much is Ray-Ban Meta Zena Gen 3 in USD?",
+                    "What is the difference between Gen 2 and Gen 3?",
+                    "Which colors are available for Zena Gen 3?",
+                    "Can I install prescription lenses?"
+                ]
+
+            elif any(w in msg for w in ["wayfarer", "headliner", "skyler", "stories", "gen 2", "gen2", "second gen"]):
+                reply = (
+                    "The iconic **Ray-Ban Meta (Gen 2)** collection represents the gold standard of daily smart eyewear at **AbooOptika**:\n\n"
+                    "• **Ray-Ban Meta Wayfarer** (from 185,000 ₸ / ~$370 USD) — The timeless trapezoidal silhouette. Available in Standard (50-22) and Large (53-22). Features 12 MP camera, 5 microphones, open-ear audio, and temple touchpad.\n"
+                    "• **Ray-Ban Meta Headliner** (190,000 ₸ / ~$380 USD) — Rounded frame with a keyhole bridge (50-23), ideal for square and angular faces.\n"
+                    "• **Ray-Ban Meta Skyler** (195,000 ₸ / ~$390 USD) — Sophisticated vintage cat-eye silhouette (52-20) tailored for narrow to medium faces.\n\n"
+                    "All models record 1080p vertical video for Instagram and TikTok, stream music via open-ear speakers, and handle crystal-clear phone calls with directional beamforming."
+                )
+                prompts = [
+                    "Compare Wayfarer vs Headliner",
+                    "Should I get Wayfarer size 50 or 53?",
+                    "How do I book a salon fitting?",
+                    "How much are Transitions GEN S lenses?"
+                ]
+
+            elif any(w in msg for w in ["streetwear", "outfit", "style", "hoodie", "cargo", "sneaker", "fashion", "look", "cloth"]):
+                reply = (
+                    "As **AbooOptika's** personal AI stylist, smart glasses are the ultimate statement accessory to elevate your complete outfit! 🔥\n\n"
+                    "Here are our curated styling formulas:\n\n"
+                    "1. **Modern Streetwear & Techwear**:\n"
+                    "• Frames: Translucent icy **Meta Fury Limited Edition** (350,000 ₸ / ~$700 USD) or aerodynamic **Oakley Vanguard** (270,000 ₸ / ~$540 USD).\n"
+                    "• Outfit: Heavyweight charcoal oversized hoodie, tactical nylon cargo trousers with utilitarian straps, and a boxy puffer vest.\n"
+                    "• Footwear: Technical trail sneakers (Salomon XT-6, Roa Hiking, or Asics Gel-Kayano 14).\n\n"
+                    "2. **Clean Minimalist / Old Money**:\n"
+                    "• Frames: Classic **Ray-Ban Meta Wayfarer** in Shiny Black (185,000 ₸ / ~$370 USD) or **Clubmaster Audio** (175,000 ₸ / ~$350 USD).\n"
+                    "• Outfit: Tailored relaxed wool overcoat, heavyweight crewneck knit sweater, straight-leg pleat chinos.\n"
+                    "• Footwear: Minimalist leather court sneakers or suede penny loafers.\n\n"
+                    "3. **High-Fashion Statement**:\n"
+                    "• Frames: Burgundy and gold **Meta Capri LISA Edition** (295,000 ₸ / ~$590 USD).\n"
+                    "• Outfit: Oversized distressed leather bomber, relaxed raw denim, and subtle gold accents matching frame hardware."
+                )
+                prompts = [
+                    "Which glasses match my personal style?",
+                    "Tell me more about Meta Capri LISA Edition",
+                    "Which model works with business suits?",
+                    "How do I book a salon styling session?"
+                ]
+
+            elif any(w in msg for w in ["lisa", "limited", "capri", "adventurer"]):
+                reply = (
+                    "The limited-edition **LISA Edition** is Meta's premier luxury collaboration, blending haute couture aesthetics with cutting-edge smart technology:\n\n"
+                    "1. **Meta Adventurer LISA Edition** (290,000 ₸ / ~$580 USD) — High-gloss Shiny Black acetate with Rose Gold micro-engraved hinges. Balanced classic square geometry (54-19-145).\n"
+                    "2. **Meta Capri LISA Edition** (295,000 ₸ / ~$590 USD) — Expressive cat-eye silhouette in rich Burgundy Tortoise with 24K gold hardware accents.\n\n"
+                    "Both models feature the 12 MP Ultra-wide camera, 5-microphone beamforming array, and custom debossed leather rapid-charging cases. Available in limited quantities at AbooOptika boutiques."
+                )
+                prompts = [
+                    "Does Capri LISA suit my face shape?",
+                    "Compare Adventurer LISA vs Wayfarer",
+                    "How do I reserve a fitting at AbooOptika?",
+                    "What other limited editions are available?"
+                ]
+
+            elif any(w in msg for w in ["audio", "sound", "speaker", "no camera", "without camera", "clubmaster", "burbank"]):
+                reply = (
+                    "For professional workplace environments, confidential meetings, and strict business dress codes without cameras, Meta offers two dedicated audio smart frames:\n\n"
+                    "1. **Ray-Ban Meta Clubmaster Audio Edition** (175,000 ₸ / ~$350 USD) — Heritage Browline silhouette (51-21-145) with gold metallic rim and black upper brow.\n"
+                    "2. **Ray-Ban Meta Burbank Audio Edition** (170,000 ₸ / ~$340 USD) — Sleek rectangular frame (54-20-145) in Havana Tortoise.\n\n"
+                    "Both models feature custom directional open-ear acoustic drivers with deep bass and wind-cancellation mics for phone calls, with zero cameras or recording LEDs."
+                )
+                prompts = [
+                    "Can I install prescription lenses?",
+                    "How long does the talk time battery last?",
+                    "Compare Clubmaster Audio and Burbank Audio",
+                    "Match a model to my face shape"
+                ]
+
+            elif any(w in msg for w in ["fury", "vanguard", "sport", "oakley", "translucent", "ice", "display", "ar", "orion"]):
+                reply = (
+                    "At the forefront of eyewear innovation, **AbooOptika** presents high-performance smart frames:\n\n"
+                    "• **Meta Fury (Limited Edition)** (350,000 ₸ / ~$700 USD) — Semi-transparent Crystal Ice chassis crafted from Swiss TR90 (46g total weight), 12 MP Ultra-wide camera with electronic stabilization, and touchpad navigation.\n"
+                    "• **Oakley Meta Vanguard** (270,000 ₸ / ~$540 USD) — Aerodynamic shield lens with Unobtainium grip earsocks and IPX4 weatherproofing.\n"
+                    "• **Meta Orion (AR Holographic Display)** (650,000 ₸ / ~$1,300 USD) — Prototype with MicroLED projectors, 70° holographic field of view, and neural wristband control.\n\n"
+                    "Each model is available for private demonstration in our flagship boutiques."
+                )
+                prompts = [
+                    "How does the AR display in Meta Orion work?",
+                    "Difference between Fury and Oakley Vanguard?",
+                    "Book an in-store trial fitting",
+                    "Match smart glasses to my face shape"
+                ]
+
+            elif any(w in msg for w in ["lens", "transition", "prescription", "diopter", "photochromic", "vision"]):
+                reply = (
+                    "All smart glasses in the **AbooOptika** collection support custom prescription and sun lens installation:\n\n"
+                    "• **Transitions® GEN S™** — Next-generation ultra-responsive photochromic lenses (activate in 25 seconds, fade back in 2 minutes indoors).\n"
+                    "• **Prescription Rx Lenses** (from -12.00 to +8.00 D) with premium anti-reflective, oleophobic, and hydrophobic coatings.\n"
+                    "• **Polarized Blue-Blocker** — Glare-free driving lenses with harmful digital screen blue-light filtering.\n\n"
+                    "Our in-store optometrists custom-grind and mount each lens while preserving full Meta factory warranty."
+                )
+                prompts = [
+                    "How much are Transitions GEN S lenses?",
+                    "Can smart glasses handle astigmatism?",
+                    "Which colors are available for Transitions?",
+                    "Book an optical examination"
+                ]
+
+            elif any(w in msg for w in ["price", "cost", "how much", "usd", "dollar", "tenge", "kzt", "buy", "order"]):
+                reply = (
+                    "Official pricing catalogue for Meta smart glasses at **AbooOptika** (in KZT ₸ and approximate USD):\n\n"
+                    "• **Ray-Ban Stories (Gen 1)**: From 115,000 ₸ (~$230 USD)\n"
+                    "• **Audio-Only Series (No Cameras)**: 170,000 ₸ (~$340 USD) for Burbank Audio, 175,000 ₸ (~$350 USD) for Clubmaster Audio\n"
+                    "• **Ray-Ban Meta (Gen 2)**: 185,000 ₸ (~$370 USD) for Wayfarer, up to 195,000 ₸ (~$390 USD) for Headliner / Skyler\n"
+                    "• **Gen 3 Flagships (2025)**: 245,000 ₸ (~$490 USD) for Ray-Ban Meta Zena\n"
+                    "• **Oakley Meta Performance**: 220,000 ₸ (~$440 USD) for HSTN, 270,000 ₸ (~$540 USD) for Vanguard\n"
+                    "• **Limited Editions**: 290,000 ₸ (~$580 USD) for Adventurer LISA, 295,000 ₸ (~$590 USD) for Capri LISA, 350,000 ₸ (~$700 USD) for Meta Fury\n"
+                    "• **AR Waveguide Concept**: 650,000 ₸ (~$1,300 USD) for Meta Orion\n\n"
+                    "All purchases include official manufacturer warranty, leather charging case, fast-charging cable, and custom in-salon optical alignment."
+                )
+                prompts = [
+                    "Tell me about Ray-Ban Meta Wayfarer",
+                    "How much is Ray-Ban Meta Zena Gen 3?",
+                    "What is special about the LISA Edition?",
+                    "How can I book a salon trial fitting?"
+                ]
+
+            elif any(w in msg for w in ["face", "shape", "fit", "jaw", "cheek", "recommend", "size", "caliber"]):
+                reply = (
+                    f"Based on optical harmonization principles for **{face_shape_en}**, the ideal balance is achieved through geometric contrast:\n\n"
+                    "• **Square Face**: Soft rounded silhouettes like **Ray-Ban Meta Headliner** (50-23, 190,000 ₸ / ~$380 USD) or panto **Meta Nova** soften a strong angular jawline.\n"
+                    "• **Round Face**: Structured angular silhouettes like **Ray-Ban Meta Wayfarer** (50-22 / 53-22, 185,000 ₸ / ~$370 USD) or **Meta Adventurer** visually elongate the facial oval.\n"
+                    "• **Oval Face**: Universally balanced proportions. Suits almost all silhouettes, especially **Meta Capri** (210,000 ₸ / ~$420 USD) and titanium **Meta Smart Aviator** (260,000 ₸ / ~$520 USD).\n\n"
+                    "You can try any model in our boutique or print your biometric trial slip right now!"
+                )
+                prompts = [
+                    "Tell me more about Ray-Ban Meta Wayfarer",
+                    "How do Transitions GEN S lenses work?",
+                    "How much is the Orion AR display model?",
+                    "Recommend an outfit for smart glasses"
+                ]
+
+            elif msg in ["hello", "hi", "hey", "good morning", "good afternoon", "good evening", "howdy"]:
+                reply = (
+                    "Hello! How can I assist you right now: explore our **Gen 3** flagships and classic **Wayfarer**, "
+                    "match a frame to your facial biometrics, or review pricing and Transitions lenses?"
+                )
+                prompts = [
+                    "Tell me about Ray-Ban Meta Gen 3",
+                    "Which glasses match my face shape?",
+                    "How much do glasses cost in USD?",
+                    "Show me audio-only glasses without cameras"
+                ]
+
+            else:
+                prev_context = ""
+                for prev_m in (messages or []):
+                    if prev_m.content:
+                        prev_context += " " + prev_m.content.lower()
+
+                if any(k in prev_context for k in ["zena", "gen 3", "gen3"]):
+                    reply = (
+                        "Regarding the third-generation flagship **Ray-Ban Meta Zena (Gen 3)**: the model is priced at **245,000 ₸ (~$490 USD)**, "
+                        "features a 12 MP Ultra-wide camera with 3K stabilized recording, next-generation deep-bass open-ear drivers, "
+                        "and weighs just 47 grams. The companion charging case offers up to 36 hours of battery life."
+                    )
+                elif any(k in prev_context for k in ["wayfarer", "headliner"]):
+                    reply = (
+                        "Returning to **Ray-Ban Meta Wayfarer** (from 185,000 ₸ / ~$370 USD): available in Standard (50-22) "
+                        "and Large (53-22). It includes a 12 MP camera, intuitive temple touchpad, open-ear audio, and supports custom prescription lenses."
+                    )
+                elif any(k in prev_context for k in ["lisa", "capri", "adventurer"]):
+                    reply = (
+                        "In the limited-edition **LISA Edition**, we offer **Adventurer LISA** (290,000 ₸ / ~$580 USD, Shiny Black with Rose Gold) "
+                        "and **Capri LISA** (295,000 ₸ / ~$590 USD, Burgundy Tortoise with 24K gold). Both include rapid-charge leather cases."
+                    )
+                elif any(k in prev_context for k in ["fury", "vanguard", "sport"]):
+                    reply = (
+                        "High-performance models **Oakley Vanguard** (270,000 ₸ / ~$540 USD) and **Meta Fury** (350,000 ₸ / ~$700 USD) are built "
+                        "from aerospace TR90 polymer, IPX4 splash-resistant, and ideal for running, cycling, and active lifestyles."
+                    )
+                else:
+                    reply = (
+                        "I'd be glad to help! At **AbooOptika**, we specialize in the complete 2025 Meta smart glasses collection, "
+                        "optical facial biometrics, and eyewear styling.\n\n"
+                        "Could you please specify: are you interested in a particular model (such as the **Gen 3** flagship or classic **Wayfarer**), "
+                        "fitting a frame to your facial geometry, prescription lenses, or current pricing in USD / KZT?"
+                    )
+                prompts = [
+                    "Tell me about Ray-Ban Meta Gen 3",
+                    "Recommend smart glasses for my style",
+                    "How much do top models cost in USD?",
+                    "Audio-only glasses without cameras for office"
+                ]
+
+            return reply, prompts
+
+        # =========================================================================
+        # 2. РУССКИЙ ЯЗЫК (RUSSIAN ENGINE)
+        # =========================================================================
         # 1. СМАРТ-ОЧКИ ТРЕТЬЕГО ПОКОЛЕНИЯ (RAY-BAN META GEN 3 / ZENA)
         is_gen3 = (
             any(w in msg for w in ["ген 3", "gen 3", "gen3", "3 поколен", "третье поколен", "третьем поколен", "zena", "зена"])
@@ -492,7 +807,7 @@ class ChatService:
             ]
 
         # 10. КРАТКОЕ ПРИВЕТСТВИЕ (БЕЗ ДЕФОЛТНОГО ОПИСАНИЯ АССОРТИМЕНТА)
-        elif msg in ["привет", "здравствуйте", "добрый день", "добрый вечер", "салем", "сәлем", "hi", "hello"]:
+        elif msg in ["привет", "здравствуйте", "добрый день", "добрый вечер", "салем", "сәлем"]:
             reply = (
                 "Здравствуйте! Чем могу помочь прямо сейчас: рассказать о флагманах **Gen 3** и классике **Wayfarer**, "
                 "подобрать оправу под геометрию вашего лица или проконсультировать по ценам и линзам Transitions?"

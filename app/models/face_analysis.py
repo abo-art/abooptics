@@ -185,6 +185,7 @@ class ChatMessage(BaseModel):
 class ChatRequest(BaseModel):
     messages: List[ChatMessage] = Field(..., description="История диалога")
     client_context: Optional[Dict[str, Any]] = Field(default=None, description="Биометрический контекст сканирования лица")
+    language: Optional[str] = Field(default="ru", description="Язык общения: 'ru' (русский) или 'en' (English)")
 
 class ChatResponse(BaseModel):
     success: bool = True
