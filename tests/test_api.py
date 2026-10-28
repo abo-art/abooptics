@@ -630,3 +630,75 @@ def test_ai_chat_bilingual_english_pricing_query():
     assert "usd" in reply_low or "$" in reply
     assert "₸" in reply or "tenge" in reply_low or "kzt" in reply_low
     assert "wayfarer" in reply_low or "zena" in reply_low or "lisa" in reply_low
+
+def test_privacy_guarantee_and_zero_retention_ui():
+    """
+    Проверка наличия гарантии приватности и нулевого хранения (Zero-Retention)
+    в разметке фронтенда и словарях локализации (RU и EN).
+    """
+    with open(os.path.join(STATIC_DIR, "index.html"), "r", encoding="utf-8") as f:
+        html = f.read()
+
+    # Проверка ключевых элементов UI приватности
+    assert 'id="privacy-banner"' in html
+    assert 'id="privacy-modal"' in html
+    assert 'id="btn-open-privacy"' in html
+    assert 'id="btn-close-privacy"' in html
+    assert 'id="btn-footer-privacy"' in html
+    assert 'data-i18n="privacy_badge"' in html
+    assert 'data-i18n="privacy_db_zero"' in html
+    assert 'data-i18n="privacy_modal_title"' in html
+    assert 'Zero Face Storage' in html
+
+    # Проверка словарей локализации app.js
+    with open(os.path.join(STATIC_DIR, "js", "app.js"), "r", encoding="utf-8") as f:
+        js = f.read()
+
+    assert "privacy_badge" in js
+    assert "privacy_db_zero" in js
+    assert "privacy_banner_desc" in js
+    assert "privacy_modal_title" in js
+    assert "privacy_p1_title" in js
+    assert "100% Конфиденциально" in js
+    assert "100% Confidential" in js
+    assert "Zero Face Storage" in js
+    assert "openPrivacyModal" in js
+    assert "closePrivacyModal" in js
+
+def test_ai_chat_privacy_and_zero_face_storage_query():
+    """
+    Тест ответа ИИ-консультанта на вопрос о сохранении лиц и фото в базе данных (RU и EN).
+    Консультант должен четко и авторитетно подтверждать политику Zero-Retention.
+    """
+    # 1. Вопрос на русском языке
+    payload_ru = {
+        "messages": [
+            {"role": "user", "content": "у нас на базе сохраняются лицо клиентов?"}
+        ],
+        "language": "ru"
+    }
+    res_ru = client.post("/api/chat", json=payload_ru)
+    assert res_ru.status_code == 200
+    data_ru = res_ru.json()
+    assert data_ru["success"] is True
+    reply_ru = data_ru["reply"].lower()
+    assert "не сохраняются" in reply_ru
+    assert "базе" in reply_ru or "баз" in reply_ru
+    assert "ram" in reply_ru or "памят" in reply_ru
+    assert "zero-retention" in reply_ru or "конфиденциальн" in reply_ru
+
+    # 2. Вопрос на английском языке
+    payload_en = {
+        "messages": [
+            {"role": "user", "content": "do you save customer faces or photos in a database?"}
+        ],
+        "language": "en"
+    }
+    res_en = client.post("/api/chat", json=payload_en)
+    assert res_en.status_code == 200
+    data_en = res_en.json()
+    assert data_en["success"] is True
+    reply_en = data_en["reply"].lower()
+    assert "never stored" in reply_en or "no database" in reply_en or "not stored" in reply_en
+    assert "ram" in reply_en or "in-memory" in reply_en
+    assert "zero-retention" in reply_en or "privacy" in reply_en

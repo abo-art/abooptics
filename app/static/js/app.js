@@ -85,6 +85,24 @@ const I18N = {
     card_material: 'Материал оправы',
     card_color: 'Цвет & Линзы',
     card_optometric_reason: 'Оптометрическая компенсация & Эргономика:',
+    privacy_badge: '100% Конфиденциально',
+    privacy_db_zero: 'Без сохранения фото в базе',
+    privacy_banner_desc: 'Снимки и биометрия лица обрабатываются исключительно в оперативной памяти (RAM) и удаляются сразу после расчета.',
+    privacy_learn_more: 'Подробнее о защите данных',
+    privacy_capture_hint: 'Безопасный замер: фото удаляется сразу после вычисления посадки. Без сохранения в БД.',
+    privacy_footer_link: 'Zero Face Storage Guarantee • Конфиденциальность',
+    privacy_modal_badge: 'Zero Face Storage Guarantee',
+    privacy_modal_title: 'Конфиденциальность и безопасность данных',
+    privacy_modal_sub: 'В системе AbooOptika защита персональных данных заложена в архитектуру (Privacy by Design). Мы гарантируем, что ваши лица и биометрия никогда не попадут в базы данных или сторонние сервисы.',
+    privacy_p1_title: 'База данных не хранит фото и лица (Zero Face Storage)',
+    privacy_p1_desc: 'Наш сервер не имеет таблиц, папок или баз данных для хранения фотографий клиентов. Снимки никогда не сохраняются на жесткий диск.',
+    privacy_p2_title: 'Мгновенный расчет в оперативной памяти (In-Memory RAM)',
+    privacy_p2_desc: '478 опорных точек MediaPipe Face Mesh обрабатываются в реальном времени в оперативной памяти и моментально стираются после формирования рекомендаций.',
+    privacy_p3_title: 'Сквозное шифрование HTTPS / TLS 1.3',
+    privacy_p3_desc: 'Все запросы к оптическому ядру зашифрованы по международным стандартам безопасности TLS 1.3 с 256-битным ключом, исключая любой перехват.',
+    privacy_p4_title: 'Анализ пропорций оправы, а не идентификация человека',
+    privacy_p4_desc: 'Алгоритм вычисляет исключительно геометрические соотношения оправы (ширину моста, посадку на переносице и височный упор), без попытки идентификации личности.',
+    privacy_btn_ok: 'Понятно, продолжить примерку',
     footer_copy: '© 2026 abooptika. Профессиональный инструмент оптического подбора в салоне.',
     footer_tech: 'MediaPipe Face Mesh • Геометрический анализ посадки',
     chat_trigger_title: 'ИИ-Консультант',
@@ -181,6 +199,24 @@ const I18N = {
     card_material: 'Frame Material',
     card_color: 'Color & Lenses',
     card_optometric_reason: 'Optometric Compensation & Ergonomics:',
+    privacy_badge: '100% Confidential',
+    privacy_db_zero: 'Zero Face Storage',
+    privacy_banner_desc: 'Photos and facial biometrics are processed strictly in-memory (RAM) and discarded immediately after computation.',
+    privacy_learn_more: 'Privacy Guarantee Details',
+    privacy_capture_hint: 'Safe biometric fit: frame is discarded right after geometry calculation. No DB storage.',
+    privacy_footer_link: 'Zero Face Storage Guarantee • Privacy Policy',
+    privacy_modal_badge: 'Zero Face Storage Guarantee',
+    privacy_modal_title: 'Biometric Data Privacy & Security',
+    privacy_modal_sub: 'AbooOptika is built on strict Privacy-by-Design principles. We guarantee your face images and biometric data are never saved to databases or shared with third parties.',
+    privacy_p1_title: 'Zero Face Storage (No Database for Images)',
+    privacy_p1_desc: 'Our server has no database tables, folders, or disk storage for customer photos. Images are never recorded to disk.',
+    privacy_p2_title: 'Instant In-Memory (RAM) Processing',
+    privacy_p2_desc: '478 MediaPipe Face Mesh landmarks are processed in real-time in RAM and immediately purged once recommendations are generated.',
+    privacy_p3_title: 'End-to-End Encryption (HTTPS / TLS 1.3)',
+    privacy_p3_desc: 'All optical core requests are encrypted using industry-standard TLS 1.3 with 256-bit keys, preventing any interception.',
+    privacy_p4_title: 'Optical Fit Geometry, Not Personal Identification',
+    privacy_p4_desc: 'The algorithm calculates purely geometric frame fit ratios (bridge width, nose rest, and temple alignment), never identifying customer identity.',
+    privacy_btn_ok: 'Understood, proceed with fitting',
     footer_copy: '© 2026 abooptika. Professional in-store optical fit platform.',
     footer_tech: 'MediaPipe Face Mesh • Geometric Fit Analysis',
     chat_trigger_title: 'AI Consultant',
@@ -348,6 +384,13 @@ class AboOptikaApp {
       btnClosePass: document.getElementById('btn-close-pass'),
       passContent: document.getElementById('pass-content'),
 
+      // Модальное окно конфиденциальности (Zero Face Storage)
+      privacyModal: document.getElementById('privacy-modal'),
+      btnOpenPrivacy: document.getElementById('btn-open-privacy'),
+      btnClosePrivacy: document.getElementById('btn-close-privacy'),
+      btnPrivacyOk: document.getElementById('btn-privacy-ok'),
+      btnFooterPrivacy: document.getElementById('btn-footer-privacy'),
+
       btnNewScan: document.getElementById('btn-new-scan'),
 
       // Режим консультанта
@@ -434,7 +477,6 @@ class AboOptikaApp {
     if (refreshChat && this.state.chatMessages && this.state.chatMessages.length <= 1) {
       this.renderInitialChatState();
     }
-  }
   }
 
   initAudio() {
@@ -605,6 +647,36 @@ class AboOptikaApp {
         if (e.target === this.el.passModal) this.closePassModal();
       });
     }
+
+    // Модальное окно конфиденциальности (Zero Face Storage)
+    if (this.el.btnOpenPrivacy) {
+      this.el.btnOpenPrivacy.addEventListener('click', () => this.openPrivacyModal());
+    }
+
+    if (this.el.btnFooterPrivacy) {
+      this.el.btnFooterPrivacy.addEventListener('click', () => this.openPrivacyModal());
+    }
+
+    if (this.el.btnClosePrivacy) {
+      this.el.btnClosePrivacy.addEventListener('click', () => this.closePrivacyModal());
+    }
+
+    if (this.el.btnPrivacyOk) {
+      this.el.btnPrivacyOk.addEventListener('click', () => this.closePrivacyModal());
+    }
+
+    if (this.el.privacyModal) {
+      this.el.privacyModal.addEventListener('click', (e) => {
+        if (e.target === this.el.privacyModal) this.closePrivacyModal();
+      });
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        this.closePassModal();
+        this.closePrivacyModal();
+      }
+    });
 
     if (this.el.btnNewScan) {
       this.el.btnNewScan.addEventListener('click', () => this.resetToScan());
@@ -1096,6 +1168,18 @@ class AboOptikaApp {
 
   closePassModal() {
     this.el.passModal.classList.add('hidden');
+  }
+
+  openPrivacyModal() {
+    if (this.el.privacyModal) {
+      this.el.privacyModal.classList.remove('hidden');
+    }
+  }
+
+  closePrivacyModal() {
+    if (this.el.privacyModal) {
+      this.el.privacyModal.classList.add('hidden');
+    }
   }
 
   resetToScan() {

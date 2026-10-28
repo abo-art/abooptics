@@ -177,6 +177,14 @@ class ChatService:
 - Структурируй ответы: применяй абзацы, списки, выделяй ключевые мысли и названия моделей **жирным шрифтом**.
 - Твой бренд — **AbooOptika**. Никогда не используй сторонние технические обозначения вроде «Smart Meta Lab» или «Gemini 3.5 Flash Lite».
 
+5. КОНФИДЕНЦИАЛЬНОСТЬ И ПОЛИТИКА ZERO-RETENTION (PRIVACY & ZERO FACE STORAGE):
+Если пользователь спрашивает, сохраняются ли фотографии или лица в базе данных, безопасен ли сервис или как защищены данные:
+- Четко, уверенно и авторитетно подтверди: **AbooOptika строго следует политике Zero-Retention (нулевого хранения)**.
+- Фотографии и биометрия лица **НИКОГДА не сохраняются в базе данных, на сервере или на диске**.
+- Вся обработка 478 точек MediaPipe Face Mesh происходит исключительно в оперативной памяти (RAM) в реальном времени и моментально удаляется сразу после вычисления геометрических пропорций посадки.
+- Соединение защищено сквозным протоколом HTTPS/TLS 1.3 с 256-битным шифрованием. Сервис оценивает исключительно оптическую посадку оправы, а не личность человека.
+- On English inquiries, reassure that AbooOptika complies with strict Zero-Retention biometric data policies: images and face meshes are processed transiently in RAM and never stored in any database or disk.
+
 {context_text}
 
 БАЗА ЗНАНИЙ КАТАЛОГА СМАРТ-ОЧКОВ META (25 МОДЕЛЕЙ ABOOOPTIKA):
@@ -555,6 +563,23 @@ class ChatService:
                     "How can I book a salon trial fitting?"
                 ]
 
+            elif any(w in msg for w in ["priva", "store", "storage", "save", "data", "confidential", "security", "zero-retention", "database", "retention", "gdpr", "safe"]):
+                reply = (
+                    "**No, customer photos and facial biometric data are NEVER stored in our database or on any server.**\n\n"
+                    "At **AbooOptika**, our platform is built on strict **Zero-Retention and Privacy-by-Design** principles:\n\n"
+                    "• **🚫 Zero Image Storage / No Database**: Our backend has no database tables, folders, or disk storage for user photos. Images are never recorded to disk.\n"
+                    "• **⚡ Transient In-Memory (RAM) Processing**: The 478 MediaPipe Face Mesh facial landmark points are computed strictly in ephemeral RAM in real-time and wiped immediately after diagnostic scoring is complete.\n"
+                    "• **🔒 End-to-End TLS 1.3 / HTTPS Encryption**: All data streams are protected with industry-standard 256-bit encryption.\n"
+                    "• **📐 Fit Geometry, Not Personal Identification**: The algorithm measures purely optical frame proportions (pupil alignment, bridge width, temple clearance) and never performs biometric identification.\n\n"
+                    "Your biometric privacy is 100% guaranteed."
+                )
+                prompts = [
+                    "Which smart glasses fit my face shape?",
+                    "Tell me about Ray-Ban Meta Gen 3",
+                    "How much do top models cost in USD?",
+                    "Audio-only glasses without cameras"
+                ]
+
             elif any(w in msg for w in ["face", "shape", "fit", "jaw", "cheek", "recommend", "size", "caliber"]):
                 reply = (
                     f"Based on optical harmonization principles for **{face_shape_en}**, the ideal balance is achieved through geometric contrast:\n\n"
@@ -787,7 +812,25 @@ class ChatService:
                 "Как оформить бронь на примерку?"
             ]
 
-        # 9. ПОДБОР ПО ЛИЦУ И БИОМЕТРИЯ
+        # 9. КОНФИДЕНЦИАЛЬНОСТЬ И ZERO-RETENTION (СОХРАНЕНИЕ ФОТО / ЛИЦ В БАЗЕ)
+        elif any(w in msg for w in ["сохран", "баз", "конфиденц", "приват", "безопасн", "удал", "данн", "слив", "храни", "бд"]):
+            reply = (
+                "**Нет, фотографии и лица клиентов ни в коем случае не сохраняются в нашей базе данных.**\n\n"
+                "Платформа **AbooOptika** спроектирована по строгим стандартам **Zero-Retention (Нулевое хранение)** и Privacy by Design:\n\n"
+                "• **🚫 Отсутствие баз данных для фото**: На нашем сервере физически нет таблиц, баз данных или дисковых хранилищ для клиентских фото. Снимки никогда не записываются на жесткий диск.\n"
+                "• **⚡ Расчет в оперативной памяти (RAM)**: 478 опорных точек MediaPipe Face Mesh рассчитываются исключительно в оперативной памяти (RAM) в реальном времени и моментально уничтожаются сразу после вычисления параметров посадки.\n"
+                "• **🔒 Сквозное шифрование HTTPS / TLS 1.3**: Передача данных защищена 256-битным шифрованием по протоколу TLS 1.3.\n"
+                "• **📐 Анализ геометрии, а не личности**: Алгоритм анализирует исключительно оптические параметры посадки оправы (ширина моста, центровка зрачков, височный упор) и не выполняет распознавание личности.\n\n"
+                "Ваша биометрия полностью конфиденциальна и защищена."
+            )
+            prompts = [
+                "Какие очки подойдут для моего лица?",
+                "Расскажи про Ray-Ban Meta Gen 3",
+                "Сколько стоят очки в тенге (₸)?",
+                "Очки со звуком без камер (Clubmaster)"
+            ]
+
+        # 10. ПОДБОР ПО ЛИЦУ И БИОМЕТРИЯ
         elif any(w in msg for w in ["подбор", "подойд", "лицо", "форму", "рекоменд", "размер", "калибр", "скул", "челюст"]):
             reply = (
                 f"На основе правил оптической гармонии для **{face_shape_ru}** ключевое значение имеет баланс пропорций:\n\n"
@@ -806,7 +849,7 @@ class ChatService:
                 "Подобрать очки под streetwear-аутфит"
             ]
 
-        # 10. КРАТКОЕ ПРИВЕТСТВИЕ (БЕЗ ДЕФОЛТНОГО ОПИСАНИЯ АССОРТИМЕНТА)
+        # 11. КРАТКОЕ ПРИВЕТСТВИЕ (БЕЗ ДЕФОЛТНОГО ОПИСАНИЯ АССОРТИМЕНТА)
         elif msg in ["привет", "здравствуйте", "добрый день", "добрый вечер", "салем", "сәлем"]:
             reply = (
                 "Здравствуйте! Чем могу помочь прямо сейчас: рассказать о флагманах **Gen 3** и классике **Wayfarer**, "

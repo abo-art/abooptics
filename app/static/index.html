@@ -130,6 +130,29 @@
         </p>
       </div>
 
+      <!-- ZERO-RETENTION & PRIVACY GUARANTEE BANNER -->
+      <div id="privacy-banner" class="w-full mb-4 bg-emerald-50/90 border border-emerald-500/30 rounded-xl p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 shadow-sm">
+        <div class="flex items-start gap-2.5">
+          <span class="w-8 h-8 rounded-lg bg-emerald-100 border border-emerald-300 text-emerald-800 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
+            <svg class="w-4 h-4 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+          </span>
+          <div>
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span data-i18n="privacy_badge" class="text-[10px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-200/80 px-2 py-0.5 rounded-full">100% Конфиденциально</span>
+              <span data-i18n="privacy_db_zero" class="text-[11px] font-bold text-emerald-950">Без сохранения фото в базе</span>
+            </div>
+            <p data-i18n="privacy_banner_desc" class="text-[11px] text-emerald-900/80 leading-snug mt-0.5">
+              Снимки и биометрия лица обрабатываются исключительно в оперативной памяти (RAM) и удаляются сразу после расчета.
+            </p>
+          </div>
+        </div>
+        <button id="btn-open-privacy" type="button" data-i18n="privacy_learn_more" class="shrink-0 text-[11px] font-bold text-emerald-800 hover:text-emerald-950 underline decoration-emerald-500/50 hover:decoration-emerald-900 transition-colors whitespace-nowrap self-end sm:self-center">
+          Подробнее о защите данных
+        </button>
+      </div>
+
       <!-- CAMERA VIEWFINDER CARD -->
       <div class="w-full relative rounded-2xl overflow-hidden border border-navy-900/15 shadow-xl bg-slate-900 aspect-[3/4] max-h-[480px] flex items-center justify-center" id="camera-container">
         
@@ -190,6 +213,14 @@
           <span data-i18n="btn_upload_photo">Загрузить фото примерки из галереи</span>
           <input type="file" id="file-input" accept="image/*" class="hidden">
         </label>
+
+        <!-- Privacy & Zero-Retention Security Note -->
+        <div class="flex items-center justify-center gap-1.5 mt-1 text-[11px] text-slate-500 font-medium">
+          <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+          </svg>
+          <span data-i18n="privacy_capture_hint">Безопасный замер: фото удаляется сразу после вычисления посадки. Без сохранения в БД.</span>
+        </div>
       </div>
 
       <!-- Quick Demo Presets -->
@@ -434,6 +465,109 @@
     </div>
   </div>
 
+  <!-- ================= MODAL: ZERO-RETENTION & PRIVACY GUARANTEE ================= -->
+  <div id="privacy-modal" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-lg rounded-3xl p-6 sm:p-7 border border-navy-900/15 shadow-2xl relative max-h-[92vh] overflow-y-auto">
+      
+      <!-- Close button -->
+      <button id="btn-close-privacy" type="button" aria-label="Закрыть" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-navy-950 flex items-center justify-center transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+
+      <!-- Modal Header -->
+      <div class="flex items-center gap-3.5 mb-4">
+        <div class="w-11 h-11 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 flex items-center justify-center shrink-0">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+        </div>
+        <div>
+          <span data-i18n="privacy_modal_badge" class="inline-block text-[10px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full mb-1">
+            Zero Face Storage Guarantee
+          </span>
+          <h3 data-i18n="privacy_modal_title" class="text-base sm:text-lg font-display font-extrabold text-navy-900 leading-tight">
+            Конфиденциальность и безопасность данных
+          </h3>
+        </div>
+      </div>
+
+      <p data-i18n="privacy_modal_sub" class="text-xs text-slate-600 mb-5 leading-relaxed">
+        В системе AbooOptika защита персональных данных заложена в архитектуру (Privacy by Design). Мы гарантируем, что ваши лица и биометрия никогда не попадут в базы данных или сторонние сервисы.
+      </p>
+
+      <!-- 4 Pillars of Data Protection -->
+      <div class="space-y-3 mb-6">
+        
+        <!-- Pillar 1 -->
+        <div class="p-3.5 rounded-2xl bg-slate-50 border border-navy-900/10 flex items-start gap-3">
+          <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5 font-bold text-sm">
+            🚫
+          </div>
+          <div>
+            <h4 data-i18n="privacy_p1_title" class="text-xs font-bold text-navy-900">
+              База данных не хранит фото и лица (Zero Face Storage)
+            </h4>
+            <p data-i18n="privacy_p1_desc" class="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
+              Наш сервер не имеет таблиц, папок или баз данных для хранения фотографий клиентов. Снимки никогда не сохраняются на жесткий диск.
+            </p>
+          </div>
+        </div>
+
+        <!-- Pillar 2 -->
+        <div class="p-3.5 rounded-2xl bg-slate-50 border border-navy-900/10 flex items-start gap-3">
+          <div class="w-8 h-8 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center shrink-0 mt-0.5 font-bold text-sm">
+            ⚡
+          </div>
+          <div>
+            <h4 data-i18n="privacy_p2_title" class="text-xs font-bold text-navy-900">
+              Мгновенный расчет в оперативной памяти (In-Memory RAM)
+            </h4>
+            <p data-i18n="privacy_p2_desc" class="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
+              478 опорных точек MediaPipe Face Mesh обрабатываются в реальном времени в оперативной памяти и моментально стираются после формирования рекомендаций.
+            </p>
+          </div>
+        </div>
+
+        <!-- Pillar 3 -->
+        <div class="p-3.5 rounded-2xl bg-slate-50 border border-navy-900/10 flex items-start gap-3">
+          <div class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0 mt-0.5 font-bold text-sm">
+            🔒
+          </div>
+          <div>
+            <h4 data-i18n="privacy_p3_title" class="text-xs font-bold text-navy-900">
+              Сквозное шифрование HTTPS / TLS 1.3
+            </h4>
+            <p data-i18n="privacy_p3_desc" class="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
+              Все запросы к оптическому ядру зашифрованы по международным стандартам безопасности TLS 1.3 с 256-битным ключом, исключая любой перехват.
+            </p>
+          </div>
+        </div>
+
+        <!-- Pillar 4 -->
+        <div class="p-3.5 rounded-2xl bg-slate-50 border border-navy-900/10 flex items-start gap-3">
+          <div class="w-8 h-8 rounded-xl bg-violet-100 text-violet-700 flex items-center justify-center shrink-0 mt-0.5 font-bold text-sm">
+            📐
+          </div>
+          <div>
+            <h4 data-i18n="privacy_p4_title" class="text-xs font-bold text-navy-900">
+              Анализ пропорций оправы, а не идентификация человека
+            </h4>
+            <p data-i18n="privacy_p4_desc" class="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
+              Алгоритм вычисляет исключительно геометрические соотношения оправы (ширину моста, посадку на переносице и височный упор), без попытки идентификации личности.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Action Button -->
+      <button id="btn-privacy-ok" type="button" data-i18n="privacy_btn_ok" class="btn-brand-primary w-full py-3 px-4 rounded-xl text-xs font-bold transition-all text-center">
+        Понятно, продолжить примерку
+      </button>
+
+    </div>
+  </div>
+
   <!-- ================= FOOTER ================= -->
   <footer class="mt-auto border-t border-navy-900/10 bg-white py-5 px-4 text-[12px] text-slate-500">
     <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
@@ -441,8 +575,15 @@
         <img src="/static/images/brand/logo.png" alt="abooptika" class="h-6 w-auto object-contain opacity-90">
         <span data-i18n="footer_copy">© 2026 abooptika. Профессиональный инструмент оптического подбора в салоне.</span>
       </div>
-      <div data-i18n="footer_tech" class="text-navy-900/60 font-semibold text-[11px]">
-        MediaPipe Face Mesh • Геометрический анализ посадки
+      <div class="flex items-center gap-4">
+        <button id="btn-footer-privacy" type="button" class="text-emerald-700 hover:text-emerald-900 font-semibold text-[11px] flex items-center gap-1.5 transition-colors cursor-pointer">
+          <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          <span data-i18n="privacy_footer_link">Zero Face Storage Guarantee • Конфиденциальность</span>
+        </button>
+        <span class="text-slate-300">|</span>
+        <div data-i18n="footer_tech" class="text-navy-900/60 font-semibold text-[11px]">
+          MediaPipe Face Mesh • Геометрический анализ посадки
+        </div>
       </div>
     </div>
   </footer>
