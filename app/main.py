@@ -42,28 +42,28 @@ async def root():
         return FileResponse(index_path)
     return {"message": "abooptika AI service is running", "docs": "/docs"}
 
-@app.api_route("/favicon.ico", methods=["GET", "HEAD"])
+@app.api_route("/favicon.ico", methods=["GET", "HEAD"], include_in_schema=False)
 async def favicon():
     fav_path = os.path.join(STATIC_DIR, "favicon.ico")
     if os.path.exists(fav_path):
         return FileResponse(fav_path, media_type="image/x-icon")
     raise HTTPException(status_code=404)
 
-@app.api_route("/manifest.json", methods=["GET", "HEAD"])
+@app.api_route("/manifest.json", methods=["GET", "HEAD"], include_in_schema=False)
 async def manifest():
     man_path = os.path.join(STATIC_DIR, "manifest.json")
     if os.path.exists(man_path):
         return FileResponse(man_path, media_type="application/manifest+json")
     raise HTTPException(status_code=404)
 
-@app.api_route("/apple-touch-icon.png", methods=["GET", "HEAD"])
+@app.api_route("/apple-touch-icon.png", methods=["GET", "HEAD"], include_in_schema=False)
 async def apple_touch_icon():
     icon_path = os.path.join(STATIC_DIR, "apple-touch-icon.png")
     if os.path.exists(icon_path):
         return FileResponse(icon_path, media_type="image/png")
     raise HTTPException(status_code=404)
 
-@app.get("/api/health")
+@app.get("/api/health", tags=["Система и статус"])
 async def health_check():
     try:
         service = FaceMeshService.get_instance()
@@ -79,7 +79,7 @@ async def health_check():
             content={"status": "degraded", "error": str(e)}
         )
 
-@app.post("/api/analyze", response_model=AnalyzeResponse)
+@app.post("/api/analyze", response_model=AnalyzeResponse, tags=["Биометрия и компьютерное зрение"])
 async def analyze_face(request: Request):
     """
     Основной API-эндпоинт анализа геометрии лица и оценки посадки надетой оправы.
@@ -158,7 +158,7 @@ async def analyze_face(request: Request):
             }
         )
 
-@app.get("/api/catalog")
+@app.get("/api/catalog", tags=["Каталог смарт-очков Meta"])
 async def get_catalog(
     shape: Optional[str] = Query(None, description="Фильтр по форме (wayfarer, panto, cat_eye, round, geometric, rectangular, aviator)"),
     generation: Optional[str] = Query(None, description="Фильтр по поколению (Gen 1, Gen 2, Gen 3)"),
@@ -180,7 +180,7 @@ async def get_catalog(
         "frames": frames
     }
 
-@app.get("/api/catalog/profiles")
+@app.get("/api/catalog/profiles", tags=["Каталог смарт-очков Meta"])
 async def get_catalog_profiles():
     """Возвращает 5 ключевых геометрических профилей смарт-очков Meta и их размерные сетки."""
     profiles = CatalogService.get_all_profiles()
@@ -191,7 +191,7 @@ async def get_catalog_profiles():
         "profiles": profiles
     }
 
-@app.post("/api/chat", response_model=ChatResponse)
+@app.post("/api/chat", response_model=ChatResponse, tags=["ИИ-консультант Gemini AI"])
 async def chat_with_optometrist(chat_req: ChatRequest):
     """
     Интерактивный ИИ-консультант AbooOptika по смарт-очкам Meta и биометрии лица.
